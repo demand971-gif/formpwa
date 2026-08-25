@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+*.log
+.arena
+.cache
+__pycache__/
+.venv/
+node_modules/
+FORM-PWA.zip
+media/real/new-*.png
+media/real/set*.png
+process_media.py
