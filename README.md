@@ -14,6 +14,9 @@ It is a private file collection: the training UI, programs, media, and related a
 | `manifest.json` | Install metadata (kept as source only) |
 | `sw.js` | Service-worker source (not required) |
 | `offline.html` | Offline fallback source |
+| `android/` | Android project wrapper (ready for APK packaging) |
+| `build-apk.sh` | Automated build script for Android APK |
+| `.github/workflows/build-apk.yml` | CI workflow to build APKs automatically |
 
 ## Open the files
 
@@ -24,6 +27,30 @@ python3 -m http.server 8000
 ```
 
 Then open `http://127.0.0.1:8000/` on that same machine. Do not treat that as a public live site.
+
+## Packaging as Android APK
+
+The project includes a production-ready Android wrapper in `android/` with full offline asset support, persistent local storage, custom app icons, back-button handling, and YouTube cues intent routing.
+
+### 1. Build via Android Studio
+1. Open Android Studio and select **Open**.
+2. Select the `android/` directory in this repo.
+3. Click **Build → Build Bundle(s) / APK(s) → Build APK(s)**.
+4. Locate the built APK in `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+### 2. Build via Command Line
+If you have Java 17 and the Android SDK installed:
+
+```bash
+# Build debug APK:
+./build-apk.sh debug
+
+# Build release APK:
+./build-apk.sh release
+```
+
+### 3. Automated via GitHub Actions
+A GitHub Actions workflow is included in `.github/workflows/build-apk.yml`. Pushing to your repository triggers an automated build that generates and uploads downloadable `FORM-debug.apk` and `FORM-release.apk` artifacts under the GitHub repository's **Actions** tab.
 
 ## Data
 

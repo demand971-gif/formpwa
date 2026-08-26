@@ -10,3 +10,18 @@ FORM-PWA.zip
 media/real/new-*.png
 media/real/set*.png
 process_media.py
+
+# Android build outputs & local config
+*.apk
+*.aab
+build-outputs/
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/
+android/local.properties
+android/*.iml
+android/app/*.iml
+.idea/
+*.keystore
+*.jks
