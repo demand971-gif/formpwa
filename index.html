@@ -232,10 +232,14 @@
 <div class="micro" style="margin:10px 0 6px">Warm-up progression ramp</div>
 <div id="plateWarmupLadder" style="display:grid;gap:5px;font-size:11px"></div>
 </article>
-<article class="studio-card"><h3>Backup</h3>
-<p class="micro">Download your log, PRs, favorites and schedule. Import to restore.</p>
-<button class="program-start" id="exportData" type="button">DOWNLOAD BACKUP</button>
-<label class="theme-btn" style="display:block;text-align:center;margin-top:8px;padding:12px">IMPORT BACKUP<input id="importData" type="file" accept="application/json" hidden></label>
+<article class="studio-card"><h3>Backup & Import</h3>
+<p class="micro">Export your workouts or import history directly from Hevy, Strong, FitNotes or FORM backups.</p>
+<button class="program-start" id="exportData" type="button">EXPORT JSON BACKUP</button>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+<label class="theme-btn" style="display:block;text-align:center;padding:11px;font-size:11px">IMPORT JSON<input id="importData" type="file" accept="application/json" hidden></label>
+<label class="theme-btn" style="display:block;text-align:center;padding:11px;font-size:11px;background:var(--ink);color:white">IMPORT CSV<input id="importCsv" type="file" accept=".csv,text/csv" hidden></label>
+</div>
+<div id="importResultStatus" class="micro" style="margin-top:8px;color:var(--muted)">Supports Hevy, Strong, FitNotes & spreadsheet CSVs.</div>
 </article>
 </div></section>
 <section class="section" id="progress"><div class="section-head"><div><div class="eyebrow">Your log</div><h2>Progress.</h2></div><button class="see" id="clearLog" type="button">RESET LOG</button></div>
@@ -1388,6 +1392,249 @@ document.addEventListener('click',()=>{if(soundOn)ensureAudio()},{once:true});
     }catch(e){toast('Invalid backup file')}};
     r.readAsText(f);
   };
+
+  // ── P3: Universal CSV Workout Importer (Hevy / Strong / FitNotes) ──
+  const importCsv = document.getElementById('importCsv');
+  const importStatus = document.getElementById('importResultStatus');
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    const s = String(text).replace(/^\uFEFF/, '');
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (quoted) {
+        if (c === '"') {
+          if (s[i + 1] === '"') { field += '"'; i++; }
+          else quoted = false;
+        } else field += c;
+      } else if (c === '"') quoted = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && s[i + 1] === '\n') i++;
+        row.push(field); field = '';
+        if (row.some(x => x !== '')) rows.push(row);
+        row = [];
+      } else field += c;
+    }
+    row.push(field);
+    if (row.some(x => x !== '')) rows.push(row);
+    return rows;
+  }
+
+  function detectCSVColumns(headers) {
+    const norm = h => h.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const H = headers.map(norm);
+    const find = (aliases) => {
+      for (const a of aliases) {
+        const idx = H.findIndex(h => h === a || h.includes(a));
+        if (idx !== -1) return idx;
+      }
+      return -1;
+    };
+    return {
+      exercise: find(['exercise title', 'exercise name', 'exercise']),
+      date: find(['start time', 'workout date', 'date']),
+      weight: find(['weight kg', 'weight lbs', 'weight']),
+      weightUnit: find(['weight unit']),
+      reps: find(['reps completed', 'reps', 'repetition count']),
+      workout: find(['workout name', 'title', 'routine name', 'category']),
+      rpe: find(['rpe', 'rir'])
+    };
+  }
+
+  function matchExerciseName(raw) {
+    if (!raw) return '';
+    const s = raw.toLowerCase().trim();
+    const clean = s.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+
+    const direct = exercises.find(e => e.name.toLowerCase() === clean);
+    if (direct) return direct.name;
+
+    const SPECIFIC = [
+      { match: ['bulgarian'], name: 'Bulgarian split squat' },
+      { match: ['goblet'], name: 'Goblet squat' },
+      { match: ['sumo squat'], name: 'Sumo squat' },
+      { match: ['jump squat'], name: 'Jump squat' },
+      { match: ['squat'], name: 'Barbell back squat' },
+      { match: ['incline bench', 'incline dumbbell press', 'incline dumbbell'], name: 'Incline dumbbell press' },
+      { match: ['decline push'], name: 'Decline push-up' },
+      { match: ['close grip push'], name: 'Close-grip push-up' },
+      { match: ['incline push'], name: 'Incline push-up' },
+      { match: ['push up', 'pushup'], name: 'Push-up' },
+      { match: ['bench press', 'flat bench'], name: 'Barbell bench press' },
+      { match: ['dumbbell bench'], name: 'Dumbbell bench press' },
+      { match: ['overhead press', 'military press', 'shoulder press'], name: 'Overhead press' },
+      { match: ['arnold'], name: 'Arnold press' },
+      { match: ['push press'], name: 'Push press' },
+      { match: ['pike push'], name: 'Pike push-up' },
+      { match: ['lateral raise', 'side lateral'], name: 'Lateral raise' },
+      { match: ['front raise'], name: 'Front raise' },
+      { match: ['rear delt fly', 'rear delt'], name: 'Rear delt fly' },
+      { match: ['face pull'], name: 'Face pull' },
+      { match: ['upright row'], name: 'Upright row' },
+      { match: ['bent over row', 'barbell row'], name: 'Barbell row' },
+      { match: ['dumbbell row', 'db row', 'one arm row'], name: 'Dumbbell row' },
+      { match: ['seated row', 'seated cable row', 'cable row'], name: 'Seated cable row' },
+      { match: ['lat pulldown', 'lat pull'], name: 'Lat pulldown' },
+      { match: ['pull up', 'pullup'], name: 'Pull-up' },
+      { match: ['chin up', 'chinup'], name: 'Chin-up' },
+      { match: ['straight arm pulldown'], name: 'Straight-arm pulldown' },
+      { match: ['rdl', 'romanian deadlift'], name: 'Romanian deadlift' },
+      { match: ['single leg rdl'], name: 'Single-leg RDL' },
+      { match: ['deadlift'], name: 'Romanian deadlift' },
+      { match: ['hip thrust'], name: 'Hip thrust' },
+      { match: ['glute bridge'], name: 'Glute bridge' },
+      { match: ['walking lunge'], name: 'Walking lunge' },
+      { match: ['reverse lunge', 'lunge'], name: 'Reverse lunge' },
+      { match: ['step up'], name: 'Step-up' },
+      { match: ['leg press'], name: 'Leg press' },
+      { match: ['leg extension'], name: 'Leg extension' },
+      { match: ['hamstring curl', 'leg curl'], name: 'Lying hamstring curl' },
+      { match: ['calf raise', 'calves'], name: 'Standing calf raise' },
+      { match: ['wall sit'], name: 'Wall sit' },
+      { match: ['hammer curl'], name: 'Hammer curl' },
+      { match: ['incline curl'], name: 'Incline dumbbell curl' },
+      { match: ['concentration curl'], name: 'Concentration curl' },
+      { match: ['bicep curl', 'barbell curl', 'biceps curl'], name: 'Barbell curl' },
+      { match: ['skull crusher', 'skullcrusher', 'lying tricep'], name: 'Skull crusher' },
+      { match: ['tricep pushdown', 'cable pushdown', 'pushdown'], name: 'Triceps pushdown' },
+      { match: ['tricep kickback', 'kickback'], name: 'Triceps kickback' },
+      { match: ['overhead tricep', 'french press'], name: 'Overhead triceps extension' },
+      { match: ['bench dip'], name: 'Bench dip' },
+      { match: ['chest dip', 'dips'], name: 'Chest dip' },
+      { match: ['cable fly', 'flye'], name: 'Cable fly' },
+      { match: ['dumbbell fly'], name: 'Dumbbell fly' },
+      { match: ['cable crunch'], name: 'Cable crunch' },
+      { match: ['bicycle crunch'], name: 'Bicycle crunch' },
+      { match: ['dead bug', 'deadbug'], name: 'Dead bug' },
+      { match: ['hanging knee', 'hanging leg'], name: 'Hanging knee raise' },
+      { match: ['plank'], name: 'Plank' },
+      { match: ['back extension', 'hyperextension'], name: 'Back extension' },
+      { match: ['jumping jack'], name: 'Jumping jack' },
+      { match: ['high knee'], name: 'High knees' },
+      { match: ['mountain climber'], name: 'Mountain climber' },
+      { match: ['burpee'], name: 'Burpee' },
+      { match: ['jump rope'], name: 'Jump rope' },
+      { match: ['jump squat'], name: 'Jump squat' }
+    ];
+
+    for (const item of SPECIFIC) {
+      if (item.match.some(m => clean.includes(m))) {
+        return item.name;
+      }
+    }
+    return raw;
+  }
+
+  if (importCsv) {
+    importCsv.onchange = () => {
+      const file = importCsv.files && importCsv.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const rows = parseCSV(reader.result);
+          if (rows.length < 2) {
+            toast('CSV file is empty or invalid');
+            return;
+          }
+
+          const cols = detectCSVColumns(rows[0]);
+          if (cols.exercise === -1) {
+            toast('Could not find exercise column in CSV');
+            return;
+          }
+
+          const isLbsHeader = rows[0].some(h => /lbs|pounds/i.test(h));
+          const allPrs = prs();
+          const progressData = loadProgress();
+          progressData.sessions = progressData.sessions || [];
+
+          let setsCount = 0;
+          let newPrCount = 0;
+          const workoutGroups = {};
+
+          for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r || !r[cols.exercise]) continue;
+            const rawEx = r[cols.exercise].trim();
+            if (!rawEx) continue;
+
+            const canonicalEx = matchExerciseName(rawEx);
+            let rawW = cols.weight !== -1 ? parseFloat(r[cols.weight]) : 0;
+            const rawReps = cols.reps !== -1 ? parseInt(r[cols.reps], 10) : 0;
+            if (isNaN(rawW) || rawW < 0) rawW = 0;
+            if (isNaN(rawReps) || rawReps <= 0) continue;
+
+            const unit = cols.weightUnit !== -1 && r[cols.weightUnit] ? r[cols.weightUnit].toLowerCase() : '';
+            const isLbs = unit.includes('lb') || isLbsHeader;
+            const weightKg = isLbs && rawW > 0 ? Math.round(rawW * 0.453592 * 2) / 2 : rawW;
+
+            let rawDate = cols.date !== -1 && r[cols.date] ? r[cols.date].trim() : '';
+            let dateStr = new Date().toISOString().slice(0, 10);
+            if (rawDate) {
+              const dObj = new Date(rawDate.replace(' ', 'T'));
+              if (!isNaN(dObj.getTime())) {
+                dateStr = dObj.toISOString().slice(0, 10);
+              }
+            }
+
+            const wName = cols.workout !== -1 && r[cols.workout] ? r[cols.workout].trim() : 'Workout';
+            const groupKey = dateStr + '|' + wName;
+            workoutGroups[groupKey] = workoutGroups[groupKey] || { date: dateStr, name: wName, moves: new Set() };
+            workoutGroups[groupKey].moves.add(canonicalEx);
+
+            const exRows = allPrs[canonicalEx] || [];
+            const prevBest = best1RM(exRows);
+            const est1rm = estimate1RM(weightKg, rawReps);
+
+            if (est1rm && (!prevBest || est1rm > prevBest.est)) {
+              newPrCount++;
+            }
+
+            allPrs[canonicalEx] = [{ weight: weightKg, reps: rawReps, est: est1rm, date: dateStr }].concat(exRows).slice(0, 40);
+            setsCount++;
+          }
+
+          const sessionKeys = Object.keys(workoutGroups).sort();
+          let addedSessions = 0;
+          sessionKeys.forEach(k => {
+            const grp = workoutGroups[k];
+            const alreadyExists = progressData.sessions.some(s => s.date === grp.date && s.name === grp.name);
+            if (!alreadyExists) {
+              const count = grp.moves.size;
+              progressData.sessions.unshift({
+                name: grp.name,
+                minutes: Math.max(20, count * 7),
+                date: grp.date,
+                done: count,
+                total: count,
+                ts: new Date(grp.date + 'T12:00:00').getTime()
+              });
+              progressData.totalMinutes = (progressData.totalMinutes || 0) + Math.max(20, count * 7);
+              addedSessions++;
+            }
+          });
+
+          saveJSON('form-prs', allPrs);
+          saveProgress(progressData);
+
+          renderProgress();
+          renderPrLog();
+          if (importStatus) {
+            importStatus.innerHTML = '<b style="color:var(--lime)">✓ Imported ' + addedSessions + ' sessions, ' + setsCount + ' sets across ' + Object.keys(allPrs).length + ' movements (' + newPrCount + ' new PRs)!</b>';
+          }
+          toast('✓ Imported ' + addedSessions + ' workouts & ' + setsCount + ' sets!');
+          cueDone();
+        } catch (err) {
+          console.error(err);
+          toast('Failed to parse CSV file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+  }
 })();
 </script>
 </body></html>
