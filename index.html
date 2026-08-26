@@ -100,7 +100,7 @@
   <div><div class="micro" style="color:#d8ff3e">New in this build</div><strong>Dark mode, custom sessions, PRs, reminders, calendar, backup</strong></div>
   <span style="background:var(--lime);color:var(--dark);border-radius:99px;padding:8px 12px;font-weight:900;font-size:12px">OPEN TOOLS →</span>
 </a>
-<section class="library" id="library"><div class="library-top"><div><div class="micro">Build your session</div><h2 id="libraryTitle">All exercises</h2><div class="micro" id="resultCount" style="margin-top:5px">63 movements</div></div><label class="search">⌕<input id="search" placeholder="Search exercise..." /></label></div><div class="filters" id="equipmentFilters"><button class="chip on" data-equipment="All">All equipment</button><button class="chip" data-equipment="Bodyweight">Bodyweight</button><button class="chip" data-equipment="Dumbbells">Dumbbells</button><button class="chip" data-equipment="Cable">Cable</button><button class="chip" data-equipment="Barbell">Barbell</button><button class="chip" data-equipment="Machine">Machine</button></div><div class="cards" id="cards"></div></section></div>
+<section class="library" id="library"><div class="library-top"><div><div class="micro">Build your session</div><h2 id="libraryTitle">All exercises</h2><div class="micro" id="resultCount" style="margin-top:5px">63 movements</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="search">⌕<input id="search" placeholder="Search exercise..." /></label><button id="openExtendedLibrary" class="media-tab" type="button" style="background:var(--ink);color:white;font-weight:900;letter-spacing:.3px;padding:9px 13px;white-space:nowrap">+1,300 DATABASE 🔍</button></div></div><div class="filters" id="equipmentFilters"><button class="chip on" data-equipment="All">All equipment</button><button class="chip" data-equipment="Bodyweight">Bodyweight</button><button class="chip" data-equipment="Dumbbells">Dumbbells</button><button class="chip" data-equipment="Cable">Cable</button><button class="chip" data-equipment="Barbell">Barbell</button><button class="chip" data-equipment="Machine">Machine</button></div><div class="cards" id="cards"></div></section></div>
 </section>
 <section class="section" id="plans"><div class="section-head"><div><div class="eyebrow">Trainer-inspired plans</div><h2>Pick your focus.</h2></div><button class="see" id="viewAllPlans" aria-expanded="false">VIEW ALL 50</button></div>
 <div class="program-filters" id="programFilters">
@@ -323,6 +323,7 @@
 <div class="rest-panel" id="restPanel"><div class="micro">Rest timer</div><div class="rest-count" id="restCount">0:45</div><div class="micro" id="restHint">Breathe. Next move is coming.</div><div class="rest-actions"><button class="rest-skip" id="skipRest" type="button">SKIP REST</button><button class="rest-add" id="addRest" type="button">+20s</button></div></div>
 <button class="program-start" id="finishWorkout" type="button">FINISH WORKOUT</button></div></div>
 <div class="modal" id="youtubeModal"><div class="sheet"><button class="close" id="closeYoutubeModal">×</button><div class="micro">Video tutorial</div><h2 id="youtubeTitle">Exercise tutorial</h2><iframe class="youtube-frame" id="youtubeFrame" src="about:blank" title="YouTube exercise tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><a class="youtube-direct" id="youtubeDirect" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">OPEN THIS VIDEO IN YOUTUBE ↗</a><div class="micro" style="text-align:center;margin-top:9px;line-height:1.5">External tabs work when the app is opened outside the embedded file viewer.</div><input class="youtube-url" id="youtubeUrlField" value="https://www.youtube.com/" readonly aria-label="Direct YouTube video URL"><button class="media-tab" id="copyYoutubeLink" type="button" style="width:100%;margin-top:9px">COPY YOUTUBE LINK</button><div class="micro" id="copyStatus" style="text-align:center;margin-top:8px"></div></div></div>
+<div class="modal" id="extendedModal"><div class="sheet" style="max-width:820px;width:95%"><button class="close" id="closeExtendedModal">×</button><div class="micro">openGym exercise database</div><h2 style="margin:4px 0 10px">1,324 Exercise Database</h2><p class="micro" style="margin-bottom:12px">Explore 1,324 strength, functional and conditioning movements with anatomy targets, equipment, and technique steps.</p><div style="display:flex;gap:8px;margin-bottom:10px"><div class="search" style="flex:1;width:auto"><span>🔍</span><input id="extendedSearchInput" placeholder="Search 1,300+ exercises, target muscles, equipment…" autocomplete="off"></div></div><div class="filters" id="extendedFilters" style="margin:0 0 10px;padding-bottom:6px"><button class="chip on" data-cat="all">All (1,324)</button><button class="chip" data-cat="chest">Chest</button><button class="chip" data-cat="back">Back</button><button class="chip" data-cat="upper legs">Legs</button><button class="chip" data-cat="waist">Core</button><button class="chip" data-cat="shoulders">Shoulders</button><button class="chip" data-cat="upper arms">Arms</button><button class="chip" data-cat="cardio">Cardio</button></div><div class="micro" id="extendedCount" style="margin-bottom:10px">Showing 1,324 exercises</div><div id="extendedResults" style="display:grid;gap:8px;max-height:55vh;overflow-y:auto;padding-right:4px"><div class="micro" style="text-align:center;padding:30px 0">Loading exercise database…</div></div></div></div>
 <div class="modal" id="installModal"><div class="sheet"><button class="close" id="closeInstallModal" type="button">×</button><div class="micro">Progressive web app</div><h2>Install FORM</h2><p style="color:var(--muted);line-height:1.5">FORM is a PWA. Install it to open full-screen, keep your progress, and train even when the network drops.</p>
 <ol class="cues" style="padding-left:18px">
 <li><strong>Android / Chrome:</strong> tap <em>Install</em> below, or the browser menu → <em>Install app</em> / <em>Add to Home screen</em>.</li>
@@ -1906,6 +1907,151 @@ document.addEventListener('click',()=>{if(soundOn)ensureAudio()},{once:true});
         }
       };
       reader.readAsText(file);
+    };
+  }
+
+  // ── P5: Extended Exercise Database (1,324 Movements from openGym) ──
+  const openExtLibBtn = document.getElementById('openExtendedLibrary');
+  const extModal = document.getElementById('extendedModal');
+  const closeExtModalBtn = document.getElementById('closeExtendedModal');
+  const extSearchInput = document.getElementById('extendedSearchInput');
+  const extFilters = document.getElementById('extendedFilters');
+  const extCount = document.getElementById('extendedCount');
+  const extResults = document.getElementById('extendedResults');
+
+  let extData = null;
+  let extCategory = 'all';
+  let extQuery = '';
+  let extLimit = 50;
+
+  async function loadExtendedDB() {
+    if (extData) return extData;
+    try {
+      const res = await fetch('extended-exercises.json');
+      if (res.ok) {
+        extData = await res.json();
+        return extData;
+      }
+    } catch (err) {
+      console.warn('Could not load local extended-exercises.json', err);
+    }
+    return [];
+  }
+
+  function renderExtendedResults() {
+    if (!extResults) return;
+    if (!extData) {
+      extResults.innerHTML = '<div class="micro" style="text-align:center;padding:24px 0">Loading 1,324 movements…</div>';
+      return;
+    }
+
+    const q = extQuery.toLowerCase().trim();
+    const filtered = extData.filter(ex => {
+      if (extCategory !== 'all' && ex.bp !== extCategory) return false;
+      if (!q) return true;
+      const nameMatch = ex.n && ex.n.toLowerCase().includes(q);
+      const targetMatch = ex.tg && ex.tg.toLowerCase().includes(q);
+      const eqMatch = ex.eq && ex.eq.toLowerCase().includes(q);
+      const bpMatch = ex.bp && ex.bp.toLowerCase().includes(q);
+      const smMatch = ex.sm && ex.sm.some(s => s.toLowerCase().includes(q));
+      return nameMatch || targetMatch || eqMatch || bpMatch || smMatch;
+    });
+
+    if (extCount) {
+      extCount.textContent = 'Found ' + filtered.length + ' movements' + (q ? ' matching "' + q + '"' : '');
+    }
+
+    if (!filtered.length) {
+      extResults.innerHTML = '<div class="empty">No movements match those criteria. Try another search term.</div>';
+      return;
+    }
+
+    const visible = filtered.slice(0, extLimit);
+    extResults.innerHTML = visible.map(ex => {
+      const capName = ex.n.charAt(0).toUpperCase() + ex.n.slice(1);
+      const gifUrl = ex.gif ? 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@7455efae41b330c265e7cd4b78dfa848e7ce5ebd/videos/' + ex.gif : '';
+      return '<article class="log-item" style="display:block;padding:12px 14px;border-radius:14px;background:#faf8f2">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">' +
+          '<div>' +
+            '<strong style="font-size:15px">' + capName + '</strong>' +
+            '<div style="display:flex;gap:5px;flex-wrap:wrap;margin:5px 0">' +
+              '<span style="background:var(--ink);color:white;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:900">' + (ex.bp || '').toUpperCase() + '</span>' +
+              '<span style="background:var(--lime);color:var(--dark);padding:2px 7px;border-radius:99px;font-size:9px;font-weight:900">' + (ex.tg || '').toUpperCase() + '</span>' +
+              '<span style="background:#efebe2;color:#444;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:800">' + (ex.eq || '').toUpperCase() + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px">' +
+            '<button type="button" class="chip" onclick="addExtToCustom(\'' + capName.replace(/'/g, "\\'") + '\')" style="font-size:10px;padding:5px 9px;background:var(--ink);color:white">+ ADD MOVE</button>' +
+          '</div>' +
+        '</div>' +
+        (ex.st && ex.st.length ? (
+          '<details style="margin-top:6px;font-size:11px;color:#555">' +
+            '<summary style="cursor:pointer;font-weight:800;color:var(--orange)">View Technique Instructions (' + ex.st.length + ' steps) ▾</summary>' +
+            '<ol style="margin:6px 0 4px;padding-left:18px;line-height:1.45">' +
+              ex.st.map(s => '<li style="margin:3px 0">' + s + '</li>').join('') +
+            '</ol>' +
+            (gifUrl ? '<div style="margin-top:6px"><a href="' + gifUrl + '" target="_blank" rel="noopener noreferrer" style="font-weight:900;color:var(--ink);text-decoration:underline">View Demonstration Animation ↗</a></div>' : '') +
+          '</details>'
+        ) : '') +
+      '</article>';
+    }).join('') + (filtered.length > extLimit ? '<button type="button" class="program-start" onclick="loadMoreExtended()" style="height:40px;font-size:11px;margin-top:8px">SHOW MORE MOVEMENTS (' + (filtered.length - extLimit) + ' MORE) ↓</button>' : '');
+  }
+
+  window.loadMoreExtended = () => {
+    extLimit += 50;
+    renderExtendedResults();
+  };
+
+  window.addExtToCustom = (moveName) => {
+    const builderList = document.getElementById('builderList');
+    if (builderList) {
+      const label = document.createElement('label');
+      label.innerHTML = '<input type="checkbox" value="' + moveName + '" checked> ' + moveName + ' <span class="micro" style="color:var(--orange);font-weight:900">(Database)</span>';
+      builderList.prepend(label);
+      toast('Added "' + moveName + '" to custom session builder');
+    }
+  };
+
+  if (openExtLibBtn) {
+    openExtLibBtn.onclick = async () => {
+      if (extModal) extModal.classList.add('open');
+      if (extSearchInput) extSearchInput.focus();
+      if (!extData) {
+        await loadExtendedDB();
+      }
+      renderExtendedResults();
+    };
+  }
+
+  if (closeExtModalBtn) {
+    closeExtModalBtn.onclick = () => {
+      if (extModal) extModal.classList.remove('open');
+    };
+  }
+
+  if (extModal) {
+    extModal.onclick = (e) => {
+      if (e.target === extModal) extModal.classList.remove('open');
+    };
+  }
+
+  if (extSearchInput) {
+    extSearchInput.oninput = (e) => {
+      extQuery = e.target.value;
+      extLimit = 50;
+      renderExtendedResults();
+    };
+  }
+
+  if (extFilters) {
+    extFilters.onclick = (e) => {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      extFilters.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      extCategory = btn.dataset.cat;
+      extLimit = 50;
+      renderExtendedResults();
     };
   }
 })();

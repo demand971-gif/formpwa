@@ -13,6 +13,7 @@ cp -f "$ROOT_DIR/offline.html" "$ASSETS_DIR/"
 cp -f "$ROOT_DIR/manifest.json" "$ASSETS_DIR/"
 cp -f "$ROOT_DIR/manifest.webmanifest" "$ASSETS_DIR/"
 cp -f "$ROOT_DIR/sw.js" "$ASSETS_DIR/"
+cp -f "$ROOT_DIR/extended-exercises.json" "$ASSETS_DIR/"
 
 # Sync directories
 rm -rf "$ASSETS_DIR/icons" "$ASSETS_DIR/media"
