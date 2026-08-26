@@ -1,0 +1,21 @@
+{
+  "name": "form-pwa",
+  "version": "1.0.0",
+  "description": "FORM — Train with intention gym training app",
+  "private": true,
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "sync:assets": "./scripts/sync-assets.sh",
+    "build:apk": "./build-apk.sh debug",
+    "build:apk:release": "./build-apk.sh release"
+  },
+  "keywords": [
+    "pwa",
+    "fitness",
+    "android",
+    "apk",
+    "webview"
+  ],
+  "author": "",
+  "license": "UNLICENSED"
+}

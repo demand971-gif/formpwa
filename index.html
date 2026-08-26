@@ -100,7 +100,7 @@
   <div><div class="micro" style="color:#d8ff3e">New in this build</div><strong>Dark mode, custom sessions, PRs, reminders, calendar, backup</strong></div>
   <span style="background:var(--lime);color:var(--dark);border-radius:99px;padding:8px 12px;font-weight:900;font-size:12px">OPEN TOOLS →</span>
 </a>
-<section class="library" id="library"><div class="library-top"><div><div class="micro">Build your session</div><h2 id="libraryTitle">All exercises</h2><div class="micro" id="resultCount" style="margin-top:5px">63 movements</div></div><label class="search">⌕<input id="search" placeholder="Search exercise..." /></label></div><div class="filters" id="equipmentFilters"><button class="chip on" data-equipment="All">All equipment</button><button class="chip" data-equipment="Bodyweight">Bodyweight</button><button class="chip" data-equipment="Dumbbells">Dumbbells</button><button class="chip" data-equipment="Cable">Cable</button><button class="chip" data-equipment="Barbell">Barbell</button><button class="chip" data-equipment="Machine">Machine</button></div><div class="cards" id="cards"></div></section></div>
+<section class="library" id="library"><div class="library-top"><div><div class="micro">Build your session</div><h2 id="libraryTitle">All exercises</h2><div class="view-toggle" id="librarySourceToggle" style="margin-top:6px;width:fit-content"><button type="button" class="on" data-source="core">Core (63)</button><button type="button" data-source="extended">All Database (1,324)</button></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="search">⌕<input id="search" placeholder="Search exercises, muscles, equipment..." /></label><button id="openExtendedLibrary" class="media-tab" type="button" style="background:var(--ink);color:white;font-weight:900;letter-spacing:.3px;padding:9px 13px;white-space:nowrap">DATABASE MODAL 🔍</button></div></div><div class="filters" id="equipmentFilters"><button class="chip on" data-equipment="All">All equipment</button><button class="chip" data-equipment="Bodyweight">Bodyweight</button><button class="chip" data-equipment="Dumbbells">Dumbbells</button><button class="chip" data-equipment="Cable">Cable</button><button class="chip" data-equipment="Barbell">Barbell</button><button class="chip" data-equipment="Machine">Machine</button></div><div class="cards" id="cards"></div><div id="loadMoreWrap" style="display:none;text-align:center;margin-top:16px"><button id="loadMoreCards" class="program-start" type="button" style="width:min(320px,100%)">LOAD MORE MOVEMENTS ↓</button></div></section></div>
 </section>
 <section class="section" id="plans"><div class="section-head"><div><div class="eyebrow">Trainer-inspired plans</div><h2>Pick your focus.</h2></div><button class="see" id="viewAllPlans" aria-expanded="false">VIEW ALL 50</button></div>
 <div class="program-filters" id="programFilters">
@@ -193,10 +193,70 @@
 <div class="builder-list" id="builderList"></div>
 <button class="program-start" id="startCustom" type="button">START CUSTOM SESSION</button>
 </article>
-<article class="studio-card"><h3>Backup</h3>
-<p class="micro">Download your log, PRs, favorites and schedule. Import to restore.</p>
-<button class="program-start" id="exportData" type="button">DOWNLOAD BACKUP</button>
-<label class="theme-btn" style="display:block;text-align:center;margin-top:8px;padding:12px">IMPORT BACKUP<input id="importData" type="file" accept="application/json" hidden></label>
+<article class="studio-card"><h3>1RM Calculator</h3>
+<p class="micro">Scientific submaximal load estimator (Epley, Brzycki & Lombardi formulas with 12-rep cap).</p>
+<div style="display:flex;gap:8px;margin-top:8px">
+<input class="field" id="calcWeight" placeholder="Weight (kg)" value="100" inputmode="decimal" style="margin:0;flex:1">
+<input class="field" id="calcReps" placeholder="Reps (1–12)" value="5" inputmode="numeric" style="margin:0;flex:1">
+</div>
+<div id="calc1rmOutput" style="background:var(--dark);color:white;border-radius:14px;padding:14px;margin:10px 0;text-align:center">
+<div class="micro" style="color:#a8aa9f">ESTIMATED ONE-REP MAX</div>
+<div id="calc1rmValue" style="font-size:36px;font-weight:950;letter-spacing:-1px;color:var(--lime)">116.7 kg</div>
+<div id="calcFormulaBreakdown" class="micro" style="color:#ddd;margin-top:4px">Epley: 116.7 · Brzycki: 112.5 · Lombardi: 117.5</div>
+</div>
+<div class="micro" style="margin:10px 0 6px">Training load percentages (% of 1RM)</div>
+<div id="calcPercentages" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;font-size:11px"></div>
+</article>
+<article class="studio-card"><h3>Plate Calculator</h3>
+<p class="micro">Olympic barbell loader & warm-up ladder. Calculates plates needed per side.</p>
+<div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+<input class="field" id="plateTarget" placeholder="Target weight (kg)" value="100" inputmode="decimal" style="margin:0;flex:1">
+<select class="field" id="plateBar" style="margin:0;width:130px">
+<option value="20" selected>20 kg bar</option>
+<option value="15">15 kg bar</option>
+<option value="10">10 kg bar</option>
+</select>
+</div>
+<div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">
+<button class="chip" type="button" onclick="adjustPlateTarget(-10)">-10 kg</button>
+<button class="chip" type="button" onclick="adjustPlateTarget(-2.5)">-2.5 kg</button>
+<button class="chip" type="button" onclick="adjustPlateTarget(2.5)">+2.5 kg</button>
+<button class="chip" type="button" onclick="adjustPlateTarget(10)">+10 kg</button>
+</div>
+<div style="background:var(--dark);border-radius:14px;padding:14px;margin:10px 0;text-align:center">
+<div class="micro" style="color:#a8aa9f;margin-bottom:8px">EACH SIDE OF BARBELL</div>
+<div id="plateGraphic" style="display:flex;align-items:center;justify-content:center;gap:3px;min-height:76px;padding:6px 0"></div>
+<div id="platePerSideText" style="font-size:22px;font-weight:950;color:var(--lime);margin-top:6px">40 kg / side</div>
+<div id="plateListText" class="micro" style="color:#eee">1×25kg · 1×15kg</div>
+</div>
+<div class="micro" style="margin:10px 0 6px">Warm-up progression ramp</div>
+<div id="plateWarmupLadder" style="display:grid;gap:5px;font-size:11px"></div>
+</article>
+<article class="studio-card"><h3>Auto-Progression Coach</h3>
+<p class="micro">Adaptive overload & deload engine based on your actual set history.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+<select class="field" id="progPolicy" style="margin:0">
+<option value="linear" selected>Linear (+2.5 / +5kg)</option>
+<option value="double">Double (8–12 reps)</option>
+<option value="greyskull">Greyskull LP (AMRAP)</option>
+</select>
+<select class="field" id="progExercise" style="margin:0"></select>
+</div>
+<div id="progResultCard" style="background:var(--dark);color:white;border-radius:14px;padding:14px;margin:10px 0;text-align:center">
+<div class="micro" style="color:#a8aa9f">RECOMMENDED NEXT TARGET</div>
+<div id="progTargetDisplay" style="font-size:30px;font-weight:950;letter-spacing:-1px;color:var(--lime)">102.5 kg × 5 reps</div>
+<div id="progActionBadge" style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:900;margin:6px 0;background:var(--lime);color:var(--dark)">ADVANCE +2.5 KG</div>
+<div id="progWhyText" class="micro" style="color:#ddd;line-height:1.45;margin-top:4px">Hit all target reps last session — advance load.</div>
+</div>
+</article>
+<article class="studio-card"><h3>Backup & Import</h3>
+<p class="micro">Export your workouts or import history directly from Hevy, Strong, FitNotes or FORM backups.</p>
+<button class="program-start" id="exportData" type="button">EXPORT JSON BACKUP</button>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+<label class="theme-btn" style="display:block;text-align:center;padding:11px;font-size:11px">IMPORT JSON<input id="importData" type="file" accept="application/json" hidden></label>
+<label class="theme-btn" style="display:block;text-align:center;padding:11px;font-size:11px;background:var(--ink);color:white">IMPORT CSV<input id="importCsv" type="file" accept=".csv,text/csv" hidden></label>
+</div>
+<div id="importResultStatus" class="micro" style="margin-top:8px;color:var(--muted)">Supports Hevy, Strong, FitNotes & spreadsheet CSVs.</div>
 </article>
 </div></section>
 <section class="section" id="progress"><div class="section-head"><div><div class="eyebrow">Your log</div><h2>Progress.</h2></div><button class="see" id="clearLog" type="button">RESET LOG</button></div>
@@ -215,18 +275,32 @@
 <div class="week-bars" id="weekBars"></div>
 <div class="micro" style="margin:22px 0 10px">Recent sessions</div>
 <div class="session-log" id="sessionLog"><div class="empty">Finish a workout to start your log.</div></div>
+<div class="micro" style="margin:22px 0 10px">Personal records (1RM Best)</div>
+<div class="session-log" id="prLog"><div class="empty">Log sets with weights and reps to see your 1RM PRs.</div></div>
 </section>
 <footer class="footer"><div>FORM © 2026 · TRAIN WITH INTENTION</div><div>Exercise guidance is educational. Stop if you feel pain and consult a qualified professional when needed.</div></footer>
 <nav class="mobile-nav"><button onclick="location.hash='train'">⌂</button><button onclick="location.hash='library'">◫</button><button onclick="location.hash='plans'">◎</button><button onclick="location.hash='progress'">◉</button></nav>
 </div>
 <div class="modal" id="modal"><div class="sheet"><button class="close" id="closeModal">×</button><div class="micro">Exercise guide</div><h2 id="modalTitle">Goblet squat</h2><div class="detail-meta" id="modalMeta"></div><div class="media-tabs" id="mediaTabs" style="display:none"><button class="media-tab on" data-media="picture">PICTURE</button><button class="media-tab" data-media="gif">GIF</button><button class="media-tab" data-media="video">VIDEO</button></div><div class="demo" id="modalIcon">🏋️</div><div class="cues"><div class="micro">Coach cues</div><ul id="modalCues"></ul><a class="youtube-link" id="modalYoutube" href="#" target="_blank" rel="noopener noreferrer"><span class="youtube-icon">▶</span>WATCH FORM VIDEOS ON YOUTUBE ↗</a>
-<div class="pr-box"><div class="micro">Log a set / PR</div>
+<div class="pr-box"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div class="micro">Log a set / 1RM PR</div><div style="display:flex;gap:6px;align-items:center"><button type="button" id="modalPlateToggle" class="media-tab" style="display:none;padding:3px 9px;font-size:10px">PLATES 🏋️</button><span class="micro" id="pr1rmBadge" style="display:none;background:var(--lime);color:var(--dark);padding:3px 9px;border-radius:99px;font-weight:900;letter-spacing:.3px"></span></div></div>
+<div id="modalProgBar" style="display:none;background:#faf8f2;border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:8px 0;justify-content:space-between;align-items:center">
+<div><div class="micro" style="font-weight:900;color:var(--orange)">ADAPTIVE TARGET COACH</div><div id="modalProgText" style="font-size:12px;font-weight:850;color:var(--ink)"></div></div>
+<button type="button" id="useProgBtn" class="media-tab" style="padding:5px 12px;font-size:10px;background:var(--ink);color:white;font-weight:900">USE ↵</button>
+</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
 <input class="field" id="prWeight" placeholder="Weight (kg)" inputmode="decimal" style="margin:0;flex:1;min-width:90px">
 <input class="field" id="prReps" placeholder="Reps" inputmode="numeric" style="margin:0;flex:1;min-width:70px">
 <button class="theme-btn" id="savePr" type="button">SAVE SET</button>
 </div>
-<div class="micro" id="prBest" style="margin-top:8px">No sets logged yet</div>
+<div id="modalPlateDrawer" style="display:none;margin-top:10px;padding:12px;border-radius:14px;background:var(--dark);color:white">
+<div style="display:flex;justify-content:space-between;align-items:center"><div class="micro" style="color:var(--lime)">BARBELL PLATE LOADER</div><button type="button" id="closeModalPlate" style="border:0;background:transparent;color:white;cursor:pointer;font-weight:900">✕</button></div>
+<div id="modalPlateGraphic" style="display:flex;align-items:center;justify-content:center;gap:3px;min-height:56px;padding:6px 0"></div>
+<div id="modalPlateText" style="font-size:16px;font-weight:950;text-align:center;color:var(--lime)"></div>
+<div id="modalPlateList" class="micro" style="text-align:center;color:#eee;margin-top:2px"></div>
+</div>
+<div id="prLiveCalc" class="micro" style="margin-top:6px;min-height:16px;color:var(--muted)"></div>
+<div class="micro" id="prBest" style="margin-top:6px">No sets logged yet</div>
+<div id="prHistoryList" style="margin-top:8px;display:none;max-height:120px;overflow:auto"></div>
 </div>
 </div></div></div>
 <div class="modal" id="programModal"><div class="sheet"><button class="close" id="closeProgramModal">×</button><div class="micro">Training program</div><h2 id="programTitle">Program name</h2><div class="detail-meta" id="programMeta"><span>4 weeks</span><span>3 days/week</span></div><div class="program-days" id="programDays"></div><div class="micro">Exercise preview · animated demonstrations</div><div class="preview-strip" id="programExercisePreview"></div><button class="program-start" id="programStart" type="button">START THIS PROGRAM →</button></div></div>
@@ -249,6 +323,7 @@
 <div class="rest-panel" id="restPanel"><div class="micro">Rest timer</div><div class="rest-count" id="restCount">0:45</div><div class="micro" id="restHint">Breathe. Next move is coming.</div><div class="rest-actions"><button class="rest-skip" id="skipRest" type="button">SKIP REST</button><button class="rest-add" id="addRest" type="button">+20s</button></div></div>
 <button class="program-start" id="finishWorkout" type="button">FINISH WORKOUT</button></div></div>
 <div class="modal" id="youtubeModal"><div class="sheet"><button class="close" id="closeYoutubeModal">×</button><div class="micro">Video tutorial</div><h2 id="youtubeTitle">Exercise tutorial</h2><iframe class="youtube-frame" id="youtubeFrame" src="about:blank" title="YouTube exercise tutorial" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><a class="youtube-direct" id="youtubeDirect" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">OPEN THIS VIDEO IN YOUTUBE ↗</a><div class="micro" style="text-align:center;margin-top:9px;line-height:1.5">External tabs work when the app is opened outside the embedded file viewer.</div><input class="youtube-url" id="youtubeUrlField" value="https://www.youtube.com/" readonly aria-label="Direct YouTube video URL"><button class="media-tab" id="copyYoutubeLink" type="button" style="width:100%;margin-top:9px">COPY YOUTUBE LINK</button><div class="micro" id="copyStatus" style="text-align:center;margin-top:8px"></div></div></div>
+<div class="modal" id="extendedModal"><div class="sheet" style="max-width:820px;width:95%"><button class="close" id="closeExtendedModal">×</button><div class="micro">openGym exercise database</div><h2 style="margin:4px 0 10px">1,324 Exercise Database</h2><p class="micro" style="margin-bottom:12px">Explore 1,324 strength, functional and conditioning movements with anatomy targets, equipment, and technique steps.</p><div style="display:flex;gap:8px;margin-bottom:10px"><div class="search" style="flex:1;width:auto"><span>🔍</span><input id="extendedSearchInput" placeholder="Search 1,300+ exercises, target muscles, equipment…" autocomplete="off"></div></div><div class="filters" id="extendedFilters" style="margin:0 0 10px;padding-bottom:6px"><button class="chip on" data-cat="all">All (1,324)</button><button class="chip" data-cat="chest">Chest</button><button class="chip" data-cat="back">Back</button><button class="chip" data-cat="upper legs">Legs</button><button class="chip" data-cat="waist">Core</button><button class="chip" data-cat="shoulders">Shoulders</button><button class="chip" data-cat="upper arms">Arms</button><button class="chip" data-cat="cardio">Cardio</button></div><div class="micro" id="extendedCount" style="margin-bottom:10px">Showing 1,324 exercises</div><div id="extendedResults" style="display:grid;gap:8px;max-height:55vh;overflow-y:auto;padding-right:4px"><div class="micro" style="text-align:center;padding:30px 0">Loading exercise database…</div></div></div></div>
 <div class="modal" id="installModal"><div class="sheet"><button class="close" id="closeInstallModal" type="button">×</button><div class="micro">Progressive web app</div><h2>Install FORM</h2><p style="color:var(--muted);line-height:1.5">FORM is a PWA. Install it to open full-screen, keep your progress, and train even when the network drops.</p>
 <ol class="cues" style="padding-left:18px">
 <li><strong>Android / Chrome:</strong> tap <em>Install</em> below, or the browser menu → <em>Install app</em> / <em>Add to Home screen</em>.</li>
@@ -424,34 +499,180 @@ const timer=document.getElementById('timer');
 const pause=document.getElementById('pause');
 const startWorkout=document.getElementById('startWorkout');
 function mediaSlug(x){return x.name.toLowerCase().replace(/\s+/g,'-')}
-function matchesView(x){const side=exerciseSide[x.name]||'Both';return side==='Both'||side===view}
+let librarySource = 'core'; // 'core' or 'extended'
+let extendedExercisesMapped = [];
+let cardsLimit = 48;
+
+function mapBP(bp, tg) {
+  if (bp === "chest") return "Chest";
+  if (bp === "back") return "Back";
+  if (bp === "upper legs" || bp === "lower legs") return tg === "glutes" ? "Glutes" : "Legs";
+  if (bp === "waist") return "Core";
+  if (bp === "shoulders") return "Shoulders";
+  if (bp === "upper arms" || bp === "lower arms") return tg === "triceps" ? "Triceps" : "Biceps";
+  if (bp === "cardio") return "Cardio";
+  return "Core";
+}
+
+function mapSide(part) {
+  if (part === "Chest" || part === "Core" || part === "Biceps") return "Front";
+  if (part === "Back" || part === "Triceps" || part === "Glutes") return "Back";
+  return "Both";
+}
+
+function mapEQ(eq) {
+  const e = (eq || "").toLowerCase();
+  if (e.includes("body") || e.includes("assisted")) return "Bodyweight";
+  if (e.includes("dumbbell")) return "Dumbbells";
+  if (e.includes("barbell") || e.includes("weighted") || e.includes("olympic")) return "Barbell";
+  if (e.includes("cable")) return "Cable";
+  if (e.includes("machine") || e.includes("sled") || e.includes("trainer") || e.includes("bike")) return "Machine";
+  return "Dumbbells";
+}
+
+async function initExtendedLibrary() {
+  if (extendedExercisesMapped.length) return extendedExercisesMapped;
+  try {
+    const res = await fetch('extended-exercises.json');
+    if (!res.ok) return [];
+    const db = await res.json();
+    extendedExercisesMapped = db.map(ex => {
+      const capName = ex.n.charAt(0).toUpperCase() + ex.n.slice(1);
+      const part = mapBP(ex.bp, ex.tg);
+      return {
+        name: capName,
+        part,
+        eq: mapEQ(ex.eq),
+        level: "All levels",
+        icon: "🏋️",
+        color: "#d8ff3e",
+        cues: (ex.st && ex.st.length) ? ex.st : ["Perform with steady control.", "Breathe through full range of motion."],
+        imgUrl: ex.img ? 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@7455efae41b330c265e7cd4b78dfa848e7ce5ebd/images/' + ex.img : '',
+        gifUrl: ex.gif ? 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@7455efae41b330c265e7cd4b78dfa848e7ce5ebd/videos/' + ex.gif : '',
+        side: mapSide(part),
+        isExtended: true
+      };
+    });
+    return extendedExercisesMapped;
+  } catch (e) {
+    console.warn("Could not load extended-exercises.json", e);
+    return [];
+  }
+}
+
+function getActiveExerciseList() {
+  return librarySource === 'extended' ? extendedExercisesMapped : exercises;
+}
+
+function matchesView(x){
+  const side = x.side || exerciseSide[x.name] || 'Both';
+  return side === 'Both' || side === view;
+}
+
 function render(){
- const list=exercises.filter(x=>matchesView(x)&&(part==='All'||x.part===part)&&(equipment==='All'||x.eq===equipment)&&x.name.toLowerCase().includes(query));
- libraryTitle.textContent=part==='All'?(view+' exercises'):(part+' exercises');
- resultCount.textContent=list.length+' movement'+(list.length===1?'':'s')+' shown';
- cards.innerHTML=list.length?list.map(x=>`<article class="exercise" data-name="${x.name}" tabindex="0" role="button" aria-label="View coaching instructions for ${x.name}"><button class="fav ${saved.has(x.name)?'saved':''}" data-fav="${x.name}" aria-label="Save">${saved.has(x.name)?'♥':'♡'}</button><div class="exercise-thumb"><img src="media/exercises/${mediaSlug(x)}.png" alt="${x.name} exercise illustration" loading="lazy"></div><h3>${x.name}</h3><p>${x.part} · ${x.eq}</p><span class="coach-link">VIEW COACHING →</span></article>`).join(''):'<div class="empty">No exercises match those filters. Try another equipment option.</div>'
+ const activeList = getActiveExerciseList();
+ const list = activeList.filter(x => matchesView(x) && (part === 'All' || x.part === part) && (equipment === 'All' || x.eq === equipment) && x.name.toLowerCase().includes(query));
+ libraryTitle.textContent = part === 'All' ? (view + ' exercises') : (part + ' exercises');
+ const countLabel = list.length + ' movement' + (list.length === 1 ? '' : 's') + ' shown' + (librarySource === 'extended' ? ' (1,324 db)' : '');
+ if (resultCount) resultCount.textContent = countLabel;
+ const visible = (librarySource === 'extended') ? list.slice(0, cardsLimit) : list;
+
+ cards.innerHTML = visible.length ? visible.map(x => {
+   const thumb = x.imgUrl ? x.imgUrl : `media/exercises/${mediaSlug(x)}.png`;
+   return `<article class="exercise" data-name="${x.name}" tabindex="0" role="button" aria-label="View coaching instructions for ${x.name}"><button class="fav ${saved.has(x.name)?'saved':''}" data-fav="${x.name}" aria-label="Save">${saved.has(x.name)?'♥':'♡'}</button><div class="exercise-thumb"><img src="${thumb}" alt="${x.name} exercise illustration" loading="lazy"></div><h3>${x.name}</h3><p>${x.part} · ${x.eq}</p><span class="coach-link">VIEW COACHING →</span></article>`;
+ }).join('') : '<div class="empty">No exercises match those filters. Try another equipment option.</div>';
+
+ const loadMoreWrap = document.getElementById('loadMoreWrap');
+ if (loadMoreWrap) {
+   loadMoreWrap.style.display = (librarySource === 'extended' && list.length > cardsLimit) ? 'block' : 'none';
+   const btn = document.getElementById('loadMoreCards');
+   if (btn) btn.textContent = 'LOAD MORE MOVEMENTS (' + (list.length - cardsLimit) + ' MORE) ↓';
+ }
 }
 render();
+
+const libToggle = document.getElementById('librarySourceToggle');
+if (libToggle) {
+  libToggle.onclick = async (e) => {
+    const btn = e.target.closest('[data-source]');
+    if (!btn) return;
+    libToggle.querySelectorAll('[data-source]').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    librarySource = btn.dataset.source;
+    cardsLimit = 48;
+    if (librarySource === 'extended' && !extendedExercisesMapped.length) {
+      toast('Loading 1,324 movement database…');
+      await initExtendedLibrary();
+    }
+    render();
+    toast(librarySource === 'extended' ? 'Loaded all 1,324 exercises' : 'Switched to core library');
+  };
+}
+
+const loadMoreCardsBtn = document.getElementById('loadMoreCards');
+if (loadMoreCardsBtn) {
+  loadMoreCardsBtn.onclick = () => {
+    cardsLimit += 48;
+    render();
+  };
+}
+
 function renderLabels(){document.getElementById('bodyLabels').innerHTML=labelsByView[view].map(p=>`<button type="button" data-part="${p}" class="${p===part?'on':''}">${p}</button>`).join('');document.querySelectorAll('.muscle').forEach(el=>el.classList.toggle('active',part!=='All'&&el.dataset.part===part));const hint=document.getElementById('viewHint');if(hint)hint.textContent=view+' muscles'}
 function setBodyView(next,resetPart=true){if(next!=='Front'&&next!=='Back')return;view=next;if(resetPart){part='All';equipment='All';document.querySelectorAll('[data-equipment]').forEach((x,i)=>x.classList.toggle('on',i===0))}document.querySelectorAll('.view-toggle [data-view]').forEach(x=>{const on=x.dataset.view===view;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on?'true':'false')});document.getElementById('frontMap').hidden=view!=='Front';document.getElementById('backMap').hidden=view!=='Back';renderLabels();if(resetPart){render();document.getElementById('library').scrollIntoView({behavior:'smooth',block:'start'});toast(view+' muscles loaded')}}
 function choosePart(p){if(p==='Chest'||p==='Core'||p==='Biceps'){if(view!=='Front')setBodyView('Front',false)}if(p==='Back'||p==='Glutes'||p==='Triceps'){if(view!=='Back')setBodyView('Back',false)}part=p;equipment='All';document.querySelectorAll('[data-equipment]').forEach((x,i)=>x.classList.toggle('on',i===0));renderLabels();render();document.getElementById('library').scrollIntoView({behavior:'smooth',block:'start'});toast((p==='All'?view:p)+' exercises loaded')}
 document.getElementById('bodyLabels').onclick=e=>{if(e.target.dataset.part)choosePart(e.target.dataset.part)};
 document.getElementById('figureWrap').onclick=e=>{if(e.target.dataset.part)choosePart(e.target.dataset.part)};
 document.getElementById('equipmentFilters').onclick=e=>{if(!e.target.dataset.equipment)return;equipment=e.target.dataset.equipment;document.querySelectorAll('[data-equipment]').forEach(x=>x.classList.toggle('on',x===e.target));render()};
-document.getElementById('search').oninput=e=>{query=e.target.value.toLowerCase();render()};
-cards.onclick=e=>{const f=e.target.closest('[data-fav]');if(f){e.stopPropagation();saved.has(f.dataset.fav)?saved.delete(f.dataset.fav):saved.add(f.dataset.fav);localStorage.setItem('form-favs',JSON.stringify([...saved]));toast(saved.has(f.dataset.fav)?'Saved to favorites':'Removed from favorites');render();return}const card=e.target.closest('.exercise');if(card)openExercise(exercises.find(x=>x.name===card.dataset.name))};
-let currentMediaSlug='goblet-squat',currentExerciseName='Exercise';
+document.getElementById('search').oninput=e=>{query=e.target.value.toLowerCase();cardsLimit=48;render()};
+
+cards.onclick=e=>{
+  const f=e.target.closest('[data-fav]');
+  if(f){
+    e.stopPropagation();
+    saved.has(f.dataset.fav)?saved.delete(f.dataset.fav):saved.add(f.dataset.fav);
+    localStorage.setItem('form-favs',JSON.stringify([...saved]));
+    toast(saved.has(f.dataset.fav)?'Saved to favorites':'Removed from favorites');
+    render();
+    return;
+  }
+  const card=e.target.closest('.exercise');
+  if(card){
+    const activeList = getActiveExerciseList();
+    const found = activeList.find(x=>x.name===card.dataset.name) || exercises.find(x=>x.name===card.dataset.name) || (extendedExercisesMapped&&extendedExercisesMapped.find(x=>x.name===card.dataset.name));
+    if(found) openExercise(found);
+  }
+};
+
+let currentMediaSlug='goblet-squat',currentExerciseName='Exercise',currentExerciseObj=null;
 function showMedia(type){
  document.querySelectorAll('.media-tab').forEach(b=>b.classList.toggle('on',b.dataset.media===type));
+ if (currentExerciseObj && currentExerciseObj.isExtended) {
+   const img = currentExerciseObj.imgUrl || '';
+   const gif = currentExerciseObj.gifUrl || '';
+   if(type==='picture') modalIcon.innerHTML=`<img src="${img}" alt="${currentExerciseName} form illustration"><span class="media-note">POSITION GUIDE</span>`;
+   if(type==='gif' || type==='video') modalIcon.innerHTML=`<img src="${gif}" alt="Animated ${currentExerciseName} demonstration"><span class="media-note">ANIMATED FORM GUIDE</span>`;
+   return;
+ }
  const base='media/exercises/'+currentMediaSlug;
  if(type==='picture') modalIcon.innerHTML=`<img src="${base}.png" alt="${currentExerciseName} form illustration"><span class="media-note">POSITION GUIDE</span>`;
  if(type==='gif') modalIcon.innerHTML=`<img src="${base}.gif" alt="Animated ${currentExerciseName} demonstration"><span class="media-note">ANIMATED FORM GUIDE</span>`;
  if(type==='video') modalIcon.innerHTML=`<video src="${base}.mp4" autoplay muted loop playsinline controls aria-label="${currentExerciseName} video illustration"></video>`;
 }
 mediaTabs.onclick=e=>{if(e.target.dataset.media)showMedia(e.target.dataset.media)};
+
 function openExercise(x){
+ currentExerciseObj = x;
  currentMediaSlug=mediaSlug(x);currentExerciseName=x.name;
- modalTitle.textContent=x.name;modalIcon.style.background=x.color;modalMeta.innerHTML=`<span>${x.part}</span><span>${x.eq}</span><span>${x.level}</span>`;modalCues.innerHTML=x.cues.map(c=>`<li>${c}</li>`).join('');const yt=youtubeFor(x.name);modalYoutube.href=yt.url;modalYoutube.innerHTML=`<span class="youtube-icon">▶</span>${yt.title.toUpperCase()} ↗`;
+ modalTitle.textContent=x.name;modalIcon.style.background=x.color||'#d8ff3e';modalMeta.innerHTML=`<span>${x.part}</span><span>${x.eq}</span><span>${x.level||'All levels'}</span>`;
+ const cuesList = (x.cues && x.cues.length) ? x.cues : ['Move slowly and stay in control.','Maintain steady breathing throughout range of motion.'];
+ modalCues.innerHTML=cuesList.map(c=>`<li>${c}</li>`).join('');
+ const yt=youtubeVideos[x.name]||{url:'https://www.youtube.com/results?search_query='+encodeURIComponent(x.name+' exercise proper form tutorial'),title:'Search '+x.name+' Tutorial'};
+ modalYoutube.href=yt.url;modalYoutube.innerHTML=`<span class="youtube-icon">▶</span>${yt.title.toUpperCase()} ↗`;
+ const plateToggle=document.getElementById('modalPlateToggle');
+ if(plateToggle) plateToggle.style.display=(x.eq==='Barbell')?'inline-block':'none';
+ const plateDrawer=document.getElementById('modalPlateDrawer');
+ if(plateDrawer) plateDrawer.style.display='none';
+ if(typeof updateModalProgression==='function') updateModalProgression(x.name);
  mediaTabs.style.display='flex';modalIcon.classList.add('has-media');showMedia('picture');modal.classList.add('open')
 }
 closeModal.onclick=()=>modal.classList.remove('open');modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};
@@ -569,7 +790,7 @@ const workoutMoves={
 function openProgram(name){selectedProgram=name;const days=programPlans[name]||programPlans['Strength Starter'];programTitle.textContent=name;programMeta.innerHTML=`<span>4 weeks</span><span>${days.length} days/week</span><span>${days.reduce((a,d)=>a+parseInt(d[2]),0)} min/week</span>`;programDays.innerHTML=days.map((d,i)=>`<div class="program-day"><div class="day-num">0${i+1}</div><div><h4>${d[0]}</h4><p>${d[1]}</p></div><div class="day-time">${d[2]}</div></div>`).join('');const previewMoves=workoutMoves[name]||workoutMoves['Strength Starter'];programExercisePreview.innerHTML=previewMoves.map(m=>`<a class="preview-item" href="${youtubeFor(m).url}" target="_blank" rel="noopener noreferrer" title="${youtubeFor(m).title}"><img src="media/real/${m.toLowerCase().replace(/\s+/g,'-')}.gif" alt="${m} demonstration"><span>${m} · YouTube ↗</span></a>`).join('');programModal.classList.add('open')}
 document.getElementById('closeProgramModal').onclick=()=>programModal.classList.remove('open');programModal.onclick=e=>{if(e.target===programModal)programModal.classList.remove('open')};
 function updateRunnerProgress(){const total=runnerList.children.length,done=runnerList.querySelectorAll('.done').length;runnerProgress.textContent=`${done} / ${total} COMPLETE`;if(done===total&&total)document.getElementById('finishWorkout').textContent='COMPLETE WORKOUT ✓'}
-function beginSelectedProgram(name){try{if(typeof name==='string'&&name.trim())selectedProgram=name.trim();if(typeof selectedProgram!=='string'||!selectedProgram)selectedProgram='Full-body foundation';const days=programPlans[selectedProgram]||[['Session',selectedProgram,'30 min']];const moves=workoutMoves[selectedProgram]||workoutMoves['Full-body foundation'];if(!moves||!moves.length){toast('No exercises found for this program');return;}programModal.classList.remove('open');runnerTitle.textContent=days[0][0];runnerProgram.textContent=selectedProgram;runnerList.innerHTML=moves.map((m,i)=>{const ex=exercises.find(x=>x.name===m);const cues=ex?ex.cues:['Move slowly and stay in control.','Keep a comfortable, pain-free range of motion.','Stop when your form begins to change.'];const cardio=!!(ex&&ex.part==='Cardio');return `<article class="runner-move"><img class="runner-gif" src="media/real/${m.toLowerCase().replace(/\s+/g,'-')}.gif" alt="Realistic athlete demonstrating ${m}" loading="eager"><div class="runner-copy"><strong>${m}</strong><small>${cardio?'40 sec on · 20 sec rest · 3 rounds':`3 sets · 8–12 reps · ${ex?ex.eq:'Bodyweight'}`}</small><ol class="runner-cues">${cues.map(c=>`<li>${c}</li>`).join('')}</ol><a class="youtube-link" href="${youtubeFor(m).url}" target="_blank" rel="noopener noreferrer" title="${youtubeFor(m).title}"><span class="youtube-icon">▶</span>WATCH RESEARCHED TUTORIAL ↗</a></div><span class="runner-check">${i+1}</span></article>`}).join('');sessionIsCardio=moves.some(m=>{const ex=exercises.find(x=>x.name===m);return ex&&ex.part==='Cardio'});updateRunnerProgress();startSession(selectedProgram);const hrBox=document.getElementById('hrBox');if(hrBox)hrBox.style.display=sessionIsCardio?'flex':'none';runnerModal.classList.add('open')}catch(err){console.error(err);toast('Could not start this program')}}
+function beginSelectedProgram(name){try{if(typeof name==='string'&&name.trim())selectedProgram=name.trim();if(typeof selectedProgram!=='string'||!selectedProgram)selectedProgram='Full-body foundation';const days=programPlans[selectedProgram]||[['Session',selectedProgram,'30 min']];const moves=workoutMoves[selectedProgram]||workoutMoves['Full-body foundation'];if(!moves||!moves.length){toast('No exercises found for this program');return;}programModal.classList.remove('open');runnerTitle.textContent=days[0][0];runnerProgram.textContent=selectedProgram;runnerList.innerHTML=moves.map((m,i)=>{const ex=exercises.find(x=>x.name===m);const cues=ex?ex.cues:['Move slowly and stay in control.','Keep a comfortable, pain-free range of motion.','Stop when your form begins to change.'];const cardio=!!(ex&&ex.part==='Cardio');const prog=(typeof getProgression==='function')?getProgression(m):null;const targetTag=(prog&&prog.weight>0)?`<span style="color:var(--orange);font-weight:900">🎯 ${prog.weight}kg × ${prog.reps} (${prog.action})</span> · `:((prog&&prog.kind==='up')?`<span style="color:var(--orange);font-weight:900">🎯 ${prog.reps} reps (${prog.action})</span> · `:'');return `<article class="runner-move"><img class="runner-gif" src="media/real/${m.toLowerCase().replace(/\s+/g,'-')}.gif" alt="Realistic athlete demonstrating ${m}" loading="eager"><div class="runner-copy"><strong>${m}</strong><small>${targetTag}${cardio?'40 sec on · 20 sec rest · 3 rounds':`3 sets · 8–12 reps · ${ex?ex.eq:'Bodyweight'}`}</small><ol class="runner-cues">${cues.map(c=>`<li>${c}</li>`).join('')}</ol><a class="youtube-link" href="${youtubeFor(m).url}" target="_blank" rel="noopener noreferrer" title="${youtubeFor(m).title}"><span class="youtube-icon">▶</span>WATCH RESEARCHED TUTORIAL ↗</a></div><span class="runner-check">${i+1}</span></article>`}).join('');sessionIsCardio=moves.some(m=>{const ex=exercises.find(x=>x.name===m);return ex&&ex.part==='Cardio'});updateRunnerProgress();startSession(selectedProgram);const hrBox=document.getElementById('hrBox');if(hrBox)hrBox.style.display=sessionIsCardio?'flex':'none';runnerModal.classList.add('open')}catch(err){console.error(err);toast('Could not start this program')}}
 programStart.addEventListener('click',()=>beginSelectedProgram());
 runnerList.onclick=e=>{if(e.target.closest('.youtube-link'))return;const move=e.target.closest('.runner-move');if(move){move.classList.toggle('done');move.querySelector('.runner-check').textContent=move.classList.contains('done')?'✓':[...runnerList.children].indexOf(move)+1;updateRunnerProgress();if(move.classList.contains('done')){cueDone();markNextMove();const left=[...runnerList.children].filter(x=>!x.classList.contains('done'));if(left.length)startRest(sessionIsCardio?20:45)}else stopRest()}};
 document.getElementById('closeRunnerModal').onclick=()=>runnerModal.classList.remove('open');runnerModal.onclick=e=>{if(e.target===runnerModal)runnerModal.classList.remove('open')};activeName.onclick=()=>runnerModal.classList.add('open');document.getElementById('finishWorkout').onclick=()=>{completeSession()};
@@ -693,7 +914,7 @@ function renderRest(){renderClock()}
 function markNextMove(){if(!runnerList)return;[...runnerList.children].forEach(el=>el.classList.remove('now'));const next=[...runnerList.children].find(el=>!el.classList.contains('done'));if(next)next.classList.add('now')}
 function completeSession(){stopRest();const total=runnerList?runnerList.children.length:0,done=runnerList?runnerList.querySelectorAll('.done').length:0;saveSession(selectedProgram||'Workout',seconds,done,total);runnerModal.classList.remove('open');workoutbar.classList.remove('show');running=false;clearInterval(tick);cueDone();toast((selectedProgram||'Workout')+' completed!')}
 function saveSession(name,secs,done,total){const data=loadProgress();data.sessions=data.sessions||[];const day=new Date().toISOString().slice(0,10);const mins=Math.max(1,Math.round((secs||0)/60));data.sessions.unshift({name,minutes:mins,date:day,done,total,ts:Date.now()});data.sessions=data.sessions.slice(0,50);data.totalMinutes=(data.totalMinutes||0)+mins;if(data.lastDay!==day){const y=new Date();y.setDate(y.getDate()-1);const ys=y.toISOString().slice(0,10);data.streak=(data.lastDay===ys)?(data.streak||0)+1:1;data.lastDay=day}saveProgress(data);renderProgress()}
-function renderProgress(){const data=loadProgress();const sessions=data.sessions||[];const workouts=sessions.length,mins=data.totalMinutes||0,streak=data.streak||0;const sw=document.getElementById('statWorkouts'),sm=document.getElementById('statMinutes'),ss=document.getElementById('statStreak'),sf=document.getElementById('statFavs'),sn=document.getElementById('streakNum');if(sw)sw.textContent=workouts;if(sm)sm.textContent=mins;if(ss)ss.textContent=streak;if(sf)sf.textContent=saved.size;if(sn)sn.textContent=String(streak).padStart(2,'0');const bars=document.getElementById('weekBars');if(bars){const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));const key=d.toISOString().slice(0,10);const count=sessions.filter(s=>s.date===key).length;return {key,count,label:d.toLocaleDateString(undefined,{weekday:'narrow'})}});const max=Math.max(1,...days.map(d=>d.count));bars.innerHTML=days.map(d=>`<span class="${d.count?'on':''}" title="${d.key}" style="height:${Math.max(8,(d.count/max)*100)}%"></span>`).join('')}const log=document.getElementById('sessionLog');if(log){log.innerHTML=sessions.length?sessions.slice(0,8).map(s=>`<div class="log-item"><div><strong>${s.name}</strong><div class="micro">${s.date} · ${s.done||0}/${s.total||0} moves</div></div><b>${s.minutes} min</b></div>`).join(''):'<div class="empty">Finish a workout to start your log.</div>'}}
+function renderProgress(){const data=loadProgress();const sessions=data.sessions||[];const workouts=sessions.length,mins=data.totalMinutes||0,streak=data.streak||0;const sw=document.getElementById('statWorkouts'),sm=document.getElementById('statMinutes'),ss=document.getElementById('statStreak'),sf=document.getElementById('statFavs'),sn=document.getElementById('streakNum');if(sw)sw.textContent=workouts;if(sm)sm.textContent=mins;if(ss)ss.textContent=streak;if(sf)sf.textContent=saved.size;if(sn)sn.textContent=String(streak).padStart(2,'0');const bars=document.getElementById('weekBars');if(bars){const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));const key=d.toISOString().slice(0,10);const count=sessions.filter(s=>s.date===key).length;return {key,count,label:d.toLocaleDateString(undefined,{weekday:'narrow'})}});const max=Math.max(1,...days.map(d=>d.count));bars.innerHTML=days.map(d=>`<span class="${d.count?'on':''}" title="${d.key}" style="height:${Math.max(8,(d.count/max)*100)}%"></span>`).join('')}const log=document.getElementById('sessionLog');if(log){log.innerHTML=sessions.length?sessions.slice(0,8).map(s=>`<div class="log-item"><div><strong>${s.name}</strong><div class="micro">${s.date} · ${s.done||0}/${s.total||0} moves</div></div><b>${s.minutes} min</b></div>`).join(''):'<div class="empty">Finish a workout to start your log.</div>'}if(typeof renderPrLog==='function')renderPrLog()}
 document.getElementById('skipRest').onclick=()=>{if(clock.phase==='rest')advanceAfterRest();else stopRest()};
 document.getElementById('addRest').onclick=()=>{clock.left+=20;renderClock();toast('+20 seconds')};
 const clockPause=document.getElementById('clockPause');
@@ -790,31 +1011,694 @@ document.addEventListener('click',()=>{if(soundOn)ensureAudio()},{once:true});
     beginSelectedProgram(name);
   };
 
-  // PRs
-  function prs(){return loadJSON('form-prs',{})}
-  function showPr(name){
-    const el=document.getElementById('prBest'); if(!el)return;
-    const rows=(prs()[name]||[]);
-    if(!rows.length){el.textContent='No sets logged yet';return}
-    const best=rows.reduce((a,b)=> (b.weight>a.weight || (b.weight===a.weight && b.reps>a.reps))?b:a);
-    el.textContent='Best: '+best.weight+' kg × '+best.reps+' · last '+rows[0].date;
-  }
-  const _open=window.openExercise;
-  // hook after modal open
-  const savePr=document.getElementById('savePr');
-  if(savePr)savePr.onclick=()=>{
-    const name=document.getElementById('modalTitle').textContent;
-    const weight=parseFloat(document.getElementById('prWeight').value);
-    const reps=parseInt(document.getElementById('prReps').value,10);
-    if(!weight||!reps){toast('Enter weight and reps');return}
-    const all=prs(); const day=new Date().toISOString().slice(0,10);
-    all[name]=[{weight,reps,date:day}].concat(all[name]||[]).slice(0,30);
-    saveJSON('form-prs',all);
-    showPr(name); toast('Set saved');
+  // ── 1RM Scientific Estimator & PR Engine (Extracted from openGym lib/onerm.js) ──
+  const REP_CAP = 12;
+  const ONERM_FORMULAS = {
+    epley: (w, r) => w * (1 + r / 30),
+    brzycki: (w, r) => w * 36 / (37 - r),
+    lombardi: (w, r) => w * Math.pow(r, 0.1)
   };
-  const modalTitle=document.getElementById('modalTitle');
-  const mo=new MutationObserver(()=>showPr(modalTitle.textContent));
-  if(modalTitle)mo.observe(modalTitle,{childList:true});
+
+  function estimate1RM(w, r, formula = 'epley') {
+    const weight = Number(w);
+    const reps = Number(r);
+    if (!isFinite(weight) || !isFinite(reps)) return null;
+    if (weight <= 0 || reps < 1) return null;
+    if (reps > REP_CAP) return null;
+    const fn = ONERM_FORMULAS[formula] || ONERM_FORMULAS.epley;
+    const est = reps === 1 ? weight : fn(weight, Math.round(reps));
+    if (!isFinite(est) || est <= 0) return null;
+    return Math.round(est * 10) / 10;
+  }
+
+  function best1RM(rows, formula = 'epley') {
+    let best = null;
+    (rows || []).forEach(s => {
+      const est = estimate1RM(s.weight, s.reps, formula);
+      if (est !== null && (!best || est > best.est)) {
+        best = { est, weight: Number(s.weight), reps: Math.round(Number(s.reps)), date: s.date };
+      }
+    });
+    return best;
+  }
+
+  function prs(){return loadJSON('form-prs',{})}
+
+  const prWeightIn = document.getElementById('prWeight');
+  const prRepsIn = document.getElementById('prReps');
+  const prBadge = document.getElementById('pr1rmBadge');
+  const prLive = document.getElementById('prLiveCalc');
+
+  function updateLive1rm() {
+    if (!prWeightIn || !prRepsIn || !prLive) return;
+    const name = (document.getElementById('modalTitle') || {}).textContent || '';
+    const w = parseFloat(prWeightIn.value);
+    const r = parseInt(prRepsIn.value, 10);
+    const rows = prs()[name] || [];
+    const prevBest = best1RM(rows);
+
+    if (!w || !r || w <= 0 || r <= 0) {
+      if (prBadge) prBadge.style.display = 'none';
+      prLive.textContent = '';
+      return;
+    }
+
+    if (r > REP_CAP) {
+      const est12 = estimate1RM(w, 12, 'epley');
+      if (prBadge) {
+        prBadge.style.display = 'inline-block';
+        prBadge.textContent = 'EST. 1RM: ' + est12 + ' KG*';
+        prBadge.style.background = '#ffd166';
+        prBadge.style.color = '#171816';
+      }
+      prLive.innerHTML = '<span style="color:var(--orange)">ⓘ High-rep set (' + r + ' reps). 1RM capped at 12 reps (' + est12 + ' kg) to avoid endurance overestimation.</span>';
+      return;
+    }
+
+    const est = estimate1RM(w, r, 'epley');
+    const brz = estimate1RM(w, r, 'brzycki');
+    const lom = estimate1RM(w, r, 'lombardi');
+
+    if (est) {
+      if (prBadge) {
+        prBadge.style.display = 'inline-block';
+        const isPr = !prevBest || est > prevBest.est;
+        if (isPr) {
+          const diff = prevBest ? (est - prevBest.est).toFixed(1) : est;
+          prBadge.textContent = '🔥 NEW 1RM PR: ' + est + ' KG (+' + diff + ')';
+          prBadge.style.background = 'var(--lime)';
+          prBadge.style.color = 'var(--dark)';
+        } else {
+          prBadge.textContent = 'EST. 1RM: ' + est + ' KG';
+          prBadge.style.background = '#ece8df';
+          prBadge.style.color = 'var(--ink)';
+        }
+      }
+      prLive.textContent = 'Epley: ' + est + ' kg · Brzycki: ' + brz + ' kg · Lombardi: ' + lom + ' kg';
+    }
+  }
+
+  if (prWeightIn) prWeightIn.oninput = updateLive1rm;
+  if (prRepsIn) prRepsIn.oninput = updateLive1rm;
+
+  function showPr(name){
+    const el = document.getElementById('prBest');
+    const histEl = document.getElementById('prHistoryList');
+    if (!el) return;
+    const rows = (prs()[name] || []);
+    updateLive1rm();
+
+    if (!rows.length) {
+      el.textContent = 'No sets logged yet';
+      if (histEl) { histEl.innerHTML = ''; histEl.style.display = 'none'; }
+      return;
+    }
+
+    const bestSet = rows.reduce((a, b) => (b.weight > a.weight || (b.weight === a.weight && b.reps > a.reps)) ? b : a);
+    const bestEst = best1RM(rows);
+
+    let text = 'Best: ' + bestSet.weight + ' kg × ' + bestSet.reps;
+    if (bestEst) {
+      text += ' · All-Time 1RM: ' + bestEst.est + ' kg (' + bestEst.weight + '×' + bestEst.reps + ' on ' + bestEst.date + ')';
+    }
+    el.textContent = text;
+
+    if (histEl) {
+      histEl.style.display = 'block';
+      histEl.innerHTML = '<div class="micro" style="margin:8px 0 4px;font-weight:900">Recent sets & 1RM history:</div>' +
+        rows.slice(0, 5).map(s => {
+          const est = estimate1RM(s.weight, s.reps);
+          return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);font-size:11px">' +
+            '<span>' + s.weight + ' kg × ' + s.reps + ' reps' + (est ? ' <b style="color:var(--orange)">(' + est + ' kg 1RM)</b>' : '') + '</span>' +
+            '<span style="color:var(--muted)">' + (s.date || '') + '</span>' +
+          '</div>';
+        }).join('');
+    }
+  }
+
+  const savePr = document.getElementById('savePr');
+  if (savePr) savePr.onclick = () => {
+    const name = document.getElementById('modalTitle').textContent;
+    const weight = parseFloat(document.getElementById('prWeight').value);
+    const reps = parseInt(document.getElementById('prReps').value, 10);
+    if (!weight || !reps || weight <= 0 || reps <= 0) {
+      toast('Enter valid weight and reps');
+      return;
+    }
+    const all = prs();
+    const rows = all[name] || [];
+    const prevBest = best1RM(rows);
+    const newEst = estimate1RM(weight, reps);
+    const day = new Date().toISOString().slice(0, 10);
+
+    const isNewPr = newEst && (!prevBest || newEst > prevBest.est);
+    all[name] = [{ weight, reps, est: newEst, date: day }].concat(rows).slice(0, 30);
+    saveJSON('form-prs', all);
+
+    showPr(name);
+    renderPrLog();
+
+    if (isNewPr) {
+      const diff = prevBest ? ' (+' + (newEst - prevBest.est).toFixed(1) + ' kg)' : '';
+      toast('🎉 NEW 1RM PR! ' + newEst + ' kg' + diff);
+      cueDone();
+    } else {
+      toast('Set saved: ' + weight + ' kg × ' + reps);
+    }
+  };
+
+  const modalTitle = document.getElementById('modalTitle');
+  const mo = new MutationObserver(() => showPr(modalTitle.textContent));
+  if (modalTitle) mo.observe(modalTitle, { childList: true });
+
+  window.openExerciseByName = (name) => {
+    const ex = exercises.find(x => x.name === name);
+    if (ex) openExercise(ex);
+  };
+
+  // Progress Section 1RM Records List
+  function renderPrLog() {
+    const prLogEl = document.getElementById('prLog');
+    if (!prLogEl) return;
+    const allPrs = prs();
+    const names = Object.keys(allPrs);
+
+    if (!names.length) {
+      prLogEl.innerHTML = '<div class="empty">Log sets with weights and reps in any exercise guide to track your 1RM PRs.</div>';
+      return;
+    }
+
+    const items = names.map(name => {
+      const rows = allPrs[name] || [];
+      const bestEst = best1RM(rows);
+      const heavySet = rows.reduce((a, b) => (b.weight > a.weight || (b.weight === a.weight && b.reps > a.reps)) ? b : a);
+      return {
+        name,
+        est1rm: bestEst ? bestEst.est : heavySet.weight,
+        heavySet,
+        date: bestEst ? bestEst.date : (rows[0] ? rows[0].date : '')
+      };
+    }).sort((a, b) => b.est1rm - a.est1rm);
+
+    prLogEl.innerHTML = items.map(item =>
+      '<div class="log-item" style="cursor:pointer" onclick="openExerciseByName(\'' + item.name.replace(/'/g, "\\'") + '\')">' +
+        '<div><strong>' + item.name + '</strong>' +
+          '<div class="micro">' + item.heavySet.weight + ' kg × ' + item.heavySet.reps + ' reps · ' + item.date + '</div>' +
+        '</div>' +
+        '<div style="text-align:right">' +
+          '<b style="color:var(--lime);background:var(--dark);padding:4px 9px;border-radius:8px;font-size:13px">' + item.est1rm + ' kg 1RM</b>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+  renderPrLog();
+
+  // Studio 1RM Gym Calculator
+  const calcWeight = document.getElementById('calcWeight');
+  const calcReps = document.getElementById('calcReps');
+  const calcVal = document.getElementById('calc1rmValue');
+  const calcBreakdown = document.getElementById('calcFormulaBreakdown');
+  const calcPct = document.getElementById('calcPercentages');
+
+  function render1rmCalculator() {
+    if (!calcWeight || !calcReps || !calcVal) return;
+    const w = parseFloat(calcWeight.value) || 0;
+    const r = Math.min(12, Math.max(1, parseInt(calcReps.value, 10) || 1));
+    if (w <= 0) {
+      calcVal.textContent = '0 kg';
+      if (calcBreakdown) calcBreakdown.textContent = 'Enter weight > 0';
+      if (calcPct) calcPct.innerHTML = '';
+      return;
+    }
+
+    const epley = estimate1RM(w, r, 'epley');
+    const brzycki = estimate1RM(w, r, 'brzycki');
+    const lombardi = estimate1RM(w, r, 'lombardi');
+
+    calcVal.textContent = epley + ' kg';
+    if (calcBreakdown) {
+      calcBreakdown.textContent = 'Epley: ' + epley + ' kg · Brzycki: ' + brzycki + ' kg · Lombardi: ' + lombardi + ' kg';
+    }
+
+    if (calcPct) {
+      const tiers = [
+        { pct: 100, reps: '1 rep (1RM)' },
+        { pct: 95, reps: '~2 reps' },
+        { pct: 90, reps: '~4 reps' },
+        { pct: 85, reps: '~6 reps' },
+        { pct: 80, reps: '~8 reps' },
+        { pct: 75, reps: '~10 reps' },
+        { pct: 70, reps: '~12 reps' },
+        { pct: 65, reps: '~15 reps' }
+      ];
+      calcPct.innerHTML = tiers.map(t => {
+        const load = Math.round((epley * (t.pct / 100)) * 2) / 2;
+        return '<div style="background:#faf8f2;border:1px solid var(--line);border-radius:10px;padding:6px 4px">' +
+          '<div style="font-weight:900;color:var(--orange)">' + t.pct + '%</div>' +
+          '<div style="font-size:13px;font-weight:950;margin:2px 0">' + load + ' kg</div>' +
+          '<div class="micro" style="font-size:9px">' + t.reps + '</div>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  if (calcWeight) calcWeight.oninput = render1rmCalculator;
+  if (calcReps) calcReps.oninput = render1rmCalculator;
+  render1rmCalculator();
+
+  // ── P2: Barbell Plate Calculator & Warm-Up Progression Ladder ──
+  const PLATE_SPECS = [
+    { weight: 25, color: '#ef476f', text: '#fff', height: 72, width: 14, name: '25 kg' },
+    { weight: 20, color: '#118ab2', text: '#fff', height: 72, width: 13, name: '20 kg' },
+    { weight: 15, color: '#ffd166', text: '#111', height: 64, width: 12, name: '15 kg' },
+    { weight: 10, color: '#06d6a0', text: '#111', height: 56, width: 11, name: '10 kg' },
+    { weight: 5, color: '#ffffff', text: '#111', height: 48, width: 10, name: '5 kg' },
+    { weight: 2.5, color: '#2b2d42', text: '#fff', height: 40, width: 9, name: '2.5 kg' },
+    { weight: 1.25, color: '#8d99ae', text: '#fff', height: 34, width: 8, name: '1.25 kg' }
+  ];
+
+  function calcPlates(target, bar = 20) {
+    const t = Number(target);
+    const b = Number(bar);
+    if (!isFinite(t) || t <= 0) return { ok: false, msg: 'Enter target weight > 0' };
+    if (t < b) return { ok: false, msg: 'Target weight is less than empty bar (' + b + ' kg)' };
+    const rem = t - b;
+    let perSide = rem / 2;
+    const plates = [];
+    PLATE_SPECS.forEach(spec => {
+      const count = Math.floor(perSide / spec.weight);
+      if (count > 0) {
+        for (let i = 0; i < count; i++) {
+          plates.push(spec);
+        }
+        perSide = Math.round((perSide - count * spec.weight) * 100) / 100;
+      }
+    });
+
+    return {
+      ok: true,
+      target: t,
+      bar: b,
+      perSideTotal: (t - b) / 2,
+      plates,
+      remainder: perSide
+    };
+  }
+
+  function renderPlateVisualHTML(plates, scale = 1) {
+    if (!plates || !plates.length) {
+      return '<div style="display:flex;align-items:center;color:#888;font-size:12px;height:72px">Empty bar · no plates needed</div>';
+    }
+    let html = '<div style="display:flex;align-items:center;background:#171816;padding:4px 8px;border-radius:10px">';
+    html += '<div style="width:20px;height:12px;background:#777;border-radius:2px"></div>';
+    html += '<div style="width:10px;height:52px;background:#aaa;border-radius:3px;border:1px solid #555;margin-right:4px"></div>';
+    plates.forEach(p => {
+      const h = Math.round(p.height * scale);
+      const w = Math.round(p.width * scale);
+      const fs = p.weight >= 10 ? '9px' : '7px';
+      html += '<div style="width:' + w + 'px;height:' + h + 'px;background:' + p.color + ';color:' + p.text + ';border-radius:3px;border:1px solid rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-size:' + fs + ';font-weight:900;writing-mode:vertical-rl;text-orientation:mixed;user-select:none;box-shadow:inset 0 0 3px rgba(0,0,0,0.3)" title="' + p.name + '">' +
+        p.weight +
+      '</div>';
+    });
+    html += '<div style="width:14px;height:12px;background:#777;border-radius:2px;margin-left:3px"></div>';
+    html += '</div>';
+    return html;
+  }
+
+  function formatPlatesSummary(plates) {
+    if (!plates || !plates.length) return 'Bar only';
+    const counts = {};
+    plates.forEach(p => { counts[p.weight] = (counts[p.weight] || 0) + 1; });
+    return Object.entries(counts)
+      .sort((a, b) => Number(b[0]) - Number(a[0]))
+      .map(([w, c]) => c + ' × ' + w + 'kg')
+      .join(' · ');
+  }
+
+  // Studio Plate Calculator bindings
+  const plateTargetInput = document.getElementById('plateTarget');
+  const plateBarSelect = document.getElementById('plateBar');
+  const plateGraphic = document.getElementById('plateGraphic');
+  const platePerSideText = document.getElementById('platePerSideText');
+  const plateListText = document.getElementById('plateListText');
+  const plateWarmupLadder = document.getElementById('plateWarmupLadder');
+
+  function renderStudioPlateCalc() {
+    if (!plateTargetInput || !plateBarSelect) return;
+    const target = parseFloat(plateTargetInput.value) || 0;
+    const bar = parseFloat(plateBarSelect.value) || 20;
+    const res = calcPlates(target, bar);
+
+    if (!res.ok) {
+      if (plateGraphic) plateGraphic.innerHTML = '<div style="color:var(--orange);font-size:12px;padding:12px 0">' + res.msg + '</div>';
+      if (platePerSideText) platePerSideText.textContent = '—';
+      if (plateListText) plateListText.textContent = '';
+      if (plateWarmupLadder) plateWarmupLadder.innerHTML = '';
+      return;
+    }
+
+    if (plateGraphic) plateGraphic.innerHTML = renderPlateVisualHTML(res.plates, 1);
+    if (platePerSideText) {
+      platePerSideText.textContent = res.perSideTotal + ' kg / side' + (res.remainder > 0 ? ' (+' + (res.remainder * 2) + 'kg unmatchable)' : '');
+    }
+    if (plateListText) plateListText.textContent = formatPlatesSummary(res.plates);
+
+    if (plateWarmupLadder) {
+      const warmupSteps = [
+        { label: 'Bar Warmup', pct: 0, weight: bar, reps: '10 reps' },
+        { label: 'Warmup 1', pct: 0.50, weight: Math.max(bar, Math.round((target * 0.50) / 2.5) * 2.5), reps: '5 reps' },
+        { label: 'Warmup 2', pct: 0.70, weight: Math.max(bar, Math.round((target * 0.70) / 2.5) * 2.5), reps: '3 reps' },
+        { label: 'Potentiation', pct: 0.85, weight: Math.max(bar, Math.round((target * 0.85) / 2.5) * 2.5), reps: '1 rep' },
+        { label: 'Working Set', pct: 1.00, weight: target, reps: 'Work reps' }
+      ];
+
+      const seen = new Set();
+      const uniqueSteps = warmupSteps.filter(s => {
+        if (seen.has(s.weight)) return false;
+        seen.add(s.weight);
+        return true;
+      });
+
+      plateWarmupLadder.innerHTML = uniqueSteps.map(s => {
+        const stepPlates = calcPlates(s.weight, bar);
+        const summary = stepPlates.ok ? formatPlatesSummary(stepPlates.plates) : '—';
+        const isWork = s.pct === 1.00;
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;background:' + (isWork ? 'var(--dark)' : '#faf8f2') + ';color:' + (isWork ? 'white' : 'var(--ink)') + ';border:1px solid var(--line)">' +
+          '<div>' +
+            '<strong>' + s.label + ': ' + s.weight + ' kg</strong>' +
+            '<div class="micro" style="color:' + (isWork ? '#aaa' : 'var(--muted)') + '">' + summary + '</div>' +
+          '</div>' +
+          '<div style="font-weight:900;color:' + (isWork ? 'var(--lime)' : 'var(--orange)') + '">' + s.reps + '</div>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  window.adjustPlateTarget = (delta) => {
+    if (!plateTargetInput) return;
+    const cur = parseFloat(plateTargetInput.value) || 20;
+    plateTargetInput.value = Math.max(10, Math.round((cur + delta) * 10) / 10);
+    renderStudioPlateCalc();
+  };
+
+  if (plateTargetInput) plateTargetInput.oninput = renderStudioPlateCalc;
+  if (plateBarSelect) plateBarSelect.onchange = renderStudioPlateCalc;
+  renderStudioPlateCalc();
+
+  // Modal Plate Drawer Logic
+  const modalPlateToggle = document.getElementById('modalPlateToggle');
+  const modalPlateDrawer = document.getElementById('modalPlateDrawer');
+  const closeModalPlate = document.getElementById('closeModalPlate');
+  const modalPlateGraphic = document.getElementById('modalPlateGraphic');
+  const modalPlateText = document.getElementById('modalPlateText');
+  const modalPlateList = document.getElementById('modalPlateList');
+
+  function updateModalPlates() {
+    if (!modalPlateDrawer || modalPlateDrawer.style.display === 'none') return;
+    const w = parseFloat(prWeightIn ? prWeightIn.value : 0) || 100;
+    const res = calcPlates(w, 20);
+    if (!res.ok) {
+      if (modalPlateGraphic) modalPlateGraphic.innerHTML = '<div style="color:var(--orange);font-size:12px;padding:8px 0">' + res.msg + '</div>';
+      if (modalPlateText) modalPlateText.textContent = w + ' kg';
+      if (modalPlateList) modalPlateList.textContent = '';
+      return;
+    }
+    if (modalPlateGraphic) modalPlateGraphic.innerHTML = renderPlateVisualHTML(res.plates, 0.85);
+    if (modalPlateText) modalPlateText.textContent = res.target + ' kg total · ' + res.perSideTotal + ' kg / side';
+    if (modalPlateList) modalPlateList.textContent = formatPlatesSummary(res.plates);
+  }
+
+  if (modalPlateToggle) {
+    modalPlateToggle.onclick = () => {
+      if (!modalPlateDrawer) return;
+      const isOpen = modalPlateDrawer.style.display === 'block';
+      modalPlateDrawer.style.display = isOpen ? 'none' : 'block';
+      if (!isOpen) updateModalPlates();
+    };
+  }
+  if (closeModalPlate) {
+    closeModalPlate.onclick = () => {
+      if (modalPlateDrawer) modalPlateDrawer.style.display = 'none';
+    };
+  }
+  if (prWeightIn) {
+    const origInput = prWeightIn.oninput;
+    prWeightIn.oninput = () => {
+      if (origInput) origInput();
+      updateModalPlates();
+    };
+  }
+
+  // ── P4: Auto-Progression & Adaptive Deload Engine (openGym lib/progression.js) ──
+  const HEAVY_BP = ['Legs', 'Back', 'Glutes'];
+
+  function getProgression(exName, policy = 'linear') {
+    const ex = exercises.find(e => e.name === exName);
+    const isHeavy = ex && HEAVY_BP.includes(ex.part);
+    const step = isHeavy ? 5 : 2.5;
+    const history = (prs()[exName] || []);
+
+    if (!history.length) {
+      const defaultW = (ex && ex.eq === 'Barbell') ? 20 : ((ex && ex.eq === 'Dumbbells') ? 10 : 0);
+      return {
+        kind: 'first',
+        weight: defaultW,
+        reps: 5,
+        sets: 3,
+        action: 'START',
+        why: 'No previous log found — start with baseline weight and build up.'
+      };
+    }
+
+    const last = history[0];
+    const lastW = Number(last.weight) || 0;
+    const lastR = Number(last.reps) || 0;
+
+    // Bodyweight movements progression
+    if (lastW <= 0 || (ex && ex.eq === 'Bodyweight')) {
+      if (lastR >= 15) {
+        return {
+          kind: 'up',
+          weight: 0,
+          reps: 8,
+          sets: 4,
+          action: 'ADD 4TH SET',
+          why: 'Hit ' + lastR + ' reps (reps ceiling reached) — add a 4th set and reset to 8 reps.'
+        };
+      } else if (lastR >= 8) {
+        return {
+          kind: 'up',
+          weight: 0,
+          reps: lastR + 1,
+          sets: 3,
+          action: '+1 REP',
+          why: 'Completed ' + lastR + ' reps last session — push for ' + (lastR + 1) + ' reps today.'
+        };
+      }
+      return {
+        kind: 'hold',
+        weight: 0,
+        reps: Math.max(5, lastR),
+        sets: 3,
+        action: 'REPEAT REPS',
+        why: 'Solidify form at ' + lastR + ' reps before increasing rep targets.'
+      };
+    }
+
+    // Weighted lifts progression
+    const targetReps = 5;
+    let stalls = 0;
+    for (let i = 0; i < Math.min(3, history.length); i++) {
+      if (Number(history[i].weight) >= lastW && Number(history[i].reps) < targetReps) {
+        stalls++;
+      }
+    }
+
+    if (policy === 'double') {
+      const topReps = 12, botReps = 8;
+      if (lastR >= topReps) {
+        const nextW = Math.round((lastW + step) * 10) / 10;
+        return {
+          kind: 'up',
+          weight: nextW,
+          reps: botReps,
+          sets: 3,
+          action: '+' + step + ' KG',
+          why: 'Hit top of rep range (' + topReps + ' reps) at ' + lastW + ' kg — advance to ' + nextW + ' kg and reset to ' + botReps + ' reps.'
+        };
+      } else if (stalls >= 3) {
+        const deloadW = Math.round((lastW * 0.90) / 2.5) * 2.5;
+        return {
+          kind: 'deload',
+          weight: deloadW,
+          reps: botReps,
+          sets: 3,
+          action: 'DELOAD -10%',
+          why: 'Stalled 3 sessions at ' + lastW + ' kg — deload to ' + deloadW + ' kg (-10%) to break through plateau.'
+        };
+      } else {
+        const nextR = Math.min(topReps, lastR + 1);
+        return {
+          kind: 'hold',
+          weight: lastW,
+          reps: nextR,
+          sets: 3,
+          action: 'HOLD WEIGHT',
+          why: 'Hold ' + lastW + ' kg and aim to add 1 more rep (target: ' + nextR + ' reps).'
+        };
+      }
+    }
+
+    if (policy === 'greyskull') {
+      if (lastR >= targetReps * 2) {
+        const nextW = Math.round((lastW + step * 2) * 10) / 10;
+        return {
+          kind: 'up',
+          weight: nextW,
+          reps: targetReps,
+          sets: 3,
+          action: '+' + (step * 2) + ' KG (2X JUMP)',
+          why: 'Crushed final set with ' + lastR + ' reps (double target) — take an aggressive +' + (step * 2) + ' kg jump to ' + nextW + ' kg!'
+        };
+      } else if (lastR >= targetReps) {
+        const nextW = Math.round((lastW + step) * 10) / 10;
+        return {
+          kind: 'up',
+          weight: nextW,
+          reps: targetReps,
+          sets: 3,
+          action: '+' + step + ' KG',
+          why: 'Completed all ' + lastR + ' target reps last session — increase by ' + step + ' kg to ' + nextW + ' kg.'
+        };
+      } else {
+        const deloadW = Math.round((lastW * 0.90) / 2.5) * 2.5;
+        return {
+          kind: 'deload',
+          weight: deloadW,
+          reps: targetReps,
+          sets: 3,
+          action: 'DELOAD -10%',
+          why: 'Missed target reps (' + lastR + ' < ' + targetReps + ') — reset load to ' + deloadW + ' kg (-10%) to build back fresh.'
+        };
+      }
+    }
+
+    // Default Linear progression
+    if (lastR >= targetReps) {
+      const nextW = Math.round((lastW + step) * 10) / 10;
+      return {
+        kind: 'up',
+        weight: nextW,
+        reps: targetReps,
+        sets: 3,
+        action: '+' + step + ' KG',
+        why: 'Hit all ' + lastR + ' reps at ' + lastW + ' kg — advance load by ' + step + ' kg to ' + nextW + ' kg.'
+      };
+    } else if (stalls >= 3) {
+      const deloadW = Math.round((lastW * 0.90) / 2.5) * 2.5;
+      return {
+        kind: 'deload',
+        weight: deloadW,
+        reps: targetReps,
+        sets: 3,
+        action: 'DELOAD -10%',
+        why: 'Missed target reps 3 sessions running at ' + lastW + ' kg — take a 10% deload to ' + deloadW + ' kg to break the plateau.'
+      };
+    } else {
+      return {
+        kind: 'hold',
+        weight: lastW,
+        reps: targetReps,
+        sets: 3,
+        action: 'REPEAT WEIGHT',
+        why: 'Missed target reps last session (' + lastR + '/' + targetReps + ') — hold ' + lastW + ' kg (' + (3 - stalls) + ' attempts left before deload).'
+      };
+    }
+  }
+
+  // Modal Adaptive Target Bar
+  const modalProgBar = document.getElementById('modalProgBar');
+  const modalProgText = document.getElementById('modalProgText');
+  const useProgBtn = document.getElementById('useProgBtn');
+
+  function updateModalProgression(name) {
+    if (!modalProgBar || !modalProgText) return;
+    const prog = getProgression(name, 'linear');
+    if (!prog || (prog.kind === 'first' && prog.weight === 0)) {
+      modalProgBar.style.display = 'none';
+      return;
+    }
+
+    modalProgBar.style.display = 'flex';
+    const isDeload = prog.kind === 'deload';
+    modalProgBar.style.borderColor = isDeload ? 'var(--orange)' : 'var(--line)';
+
+    let summary = '';
+    if (prog.weight > 0) {
+      summary = 'Target: ' + prog.weight + ' kg × ' + prog.reps + ' reps (' + prog.action + ')';
+    } else {
+      summary = 'Target: ' + prog.reps + ' reps (' + prog.action + ')';
+    }
+    modalProgText.innerHTML = summary + '<div class="micro" style="color:var(--muted);margin-top:2px">' + prog.why + '</div>';
+
+    if (useProgBtn) {
+      useProgBtn.onclick = () => {
+        if (prWeightIn && prog.weight > 0) prWeightIn.value = prog.weight;
+        if (prRepsIn && prog.reps > 0) prRepsIn.value = prog.reps;
+        updateLive1rm();
+        if (typeof updateModalPlates === 'function') updateModalPlates();
+        toast('Applied target: ' + prog.weight + ' kg × ' + prog.reps);
+      };
+    }
+  }
+
+  // Studio Progression Card Bindings
+  const progPolicySelect = document.getElementById('progPolicy');
+  const progExSelect = document.getElementById('progExercise');
+  const progTargetDisplay = document.getElementById('progTargetDisplay');
+  const progActionBadge = document.getElementById('progActionBadge');
+  const progWhyText = document.getElementById('progWhyText');
+
+  if (progExSelect) {
+    progExSelect.innerHTML = exercises.map(e => '<option value="' + e.name + '">' + e.name + '</option>').join('');
+  }
+
+  function renderStudioProgression() {
+    if (!progExSelect || !progPolicySelect || !progTargetDisplay) return;
+    const exName = progExSelect.value;
+    const policy = progPolicySelect.value;
+    const res = getProgression(exName, policy);
+
+    let displayStr = '';
+    if (res.weight > 0) {
+      displayStr = res.weight + ' kg × ' + res.reps + ' reps';
+    } else {
+      displayStr = res.reps + ' reps' + (res.sets ? ' (' + res.sets + ' sets)' : '');
+    }
+    progTargetDisplay.textContent = displayStr;
+
+    if (progActionBadge) {
+      progActionBadge.textContent = res.action;
+      if (res.kind === 'deload') {
+        progActionBadge.style.background = 'var(--orange)';
+        progActionBadge.style.color = 'white';
+      } else if (res.kind === 'up') {
+        progActionBadge.style.background = 'var(--lime)';
+        progActionBadge.style.color = 'var(--dark)';
+      } else {
+        progActionBadge.style.background = '#ffd166';
+        progActionBadge.style.color = 'var(--dark)';
+      }
+    }
+
+    if (progWhyText) {
+      progWhyText.textContent = res.why;
+    }
+  }
+
+  if (progPolicySelect) progPolicySelect.onchange = renderStudioProgression;
+  if (progExSelect) progExSelect.onchange = renderStudioProgression;
+  renderStudioProgression();
 
   // reminders
   function nextRemindDelay(hhmm){
@@ -923,6 +1807,394 @@ document.addEventListener('click',()=>{if(soundOn)ensureAudio()},{once:true});
     }catch(e){toast('Invalid backup file')}};
     r.readAsText(f);
   };
+
+  // ── P3: Universal CSV Workout Importer (Hevy / Strong / FitNotes) ──
+  const importCsv = document.getElementById('importCsv');
+  const importStatus = document.getElementById('importResultStatus');
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    const s = String(text).replace(/^\uFEFF/, '');
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (quoted) {
+        if (c === '"') {
+          if (s[i + 1] === '"') { field += '"'; i++; }
+          else quoted = false;
+        } else field += c;
+      } else if (c === '"') quoted = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && s[i + 1] === '\n') i++;
+        row.push(field); field = '';
+        if (row.some(x => x !== '')) rows.push(row);
+        row = [];
+      } else field += c;
+    }
+    row.push(field);
+    if (row.some(x => x !== '')) rows.push(row);
+    return rows;
+  }
+
+  function detectCSVColumns(headers) {
+    const norm = h => h.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const H = headers.map(norm);
+    const find = (aliases) => {
+      for (const a of aliases) {
+        const idx = H.findIndex(h => h === a || h.includes(a));
+        if (idx !== -1) return idx;
+      }
+      return -1;
+    };
+    return {
+      exercise: find(['exercise title', 'exercise name', 'exercise']),
+      date: find(['start time', 'workout date', 'date']),
+      weight: find(['weight kg', 'weight lbs', 'weight']),
+      weightUnit: find(['weight unit']),
+      reps: find(['reps completed', 'reps', 'repetition count']),
+      workout: find(['workout name', 'title', 'routine name', 'category']),
+      rpe: find(['rpe', 'rir'])
+    };
+  }
+
+  function matchExerciseName(raw) {
+    if (!raw) return '';
+    const s = raw.toLowerCase().trim();
+    const clean = s.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+
+    const direct = exercises.find(e => e.name.toLowerCase() === clean);
+    if (direct) return direct.name;
+
+    const SPECIFIC = [
+      { match: ['bulgarian'], name: 'Bulgarian split squat' },
+      { match: ['goblet'], name: 'Goblet squat' },
+      { match: ['sumo squat'], name: 'Sumo squat' },
+      { match: ['jump squat'], name: 'Jump squat' },
+      { match: ['squat'], name: 'Barbell back squat' },
+      { match: ['incline bench', 'incline dumbbell press', 'incline dumbbell'], name: 'Incline dumbbell press' },
+      { match: ['decline push'], name: 'Decline push-up' },
+      { match: ['close grip push'], name: 'Close-grip push-up' },
+      { match: ['incline push'], name: 'Incline push-up' },
+      { match: ['push up', 'pushup'], name: 'Push-up' },
+      { match: ['bench press', 'flat bench'], name: 'Barbell bench press' },
+      { match: ['dumbbell bench'], name: 'Dumbbell bench press' },
+      { match: ['overhead press', 'military press', 'shoulder press'], name: 'Overhead press' },
+      { match: ['arnold'], name: 'Arnold press' },
+      { match: ['push press'], name: 'Push press' },
+      { match: ['pike push'], name: 'Pike push-up' },
+      { match: ['lateral raise', 'side lateral'], name: 'Lateral raise' },
+      { match: ['front raise'], name: 'Front raise' },
+      { match: ['rear delt fly', 'rear delt'], name: 'Rear delt fly' },
+      { match: ['face pull'], name: 'Face pull' },
+      { match: ['upright row'], name: 'Upright row' },
+      { match: ['bent over row', 'barbell row'], name: 'Barbell row' },
+      { match: ['dumbbell row', 'db row', 'one arm row'], name: 'Dumbbell row' },
+      { match: ['seated row', 'seated cable row', 'cable row'], name: 'Seated cable row' },
+      { match: ['lat pulldown', 'lat pull'], name: 'Lat pulldown' },
+      { match: ['pull up', 'pullup'], name: 'Pull-up' },
+      { match: ['chin up', 'chinup'], name: 'Chin-up' },
+      { match: ['straight arm pulldown'], name: 'Straight-arm pulldown' },
+      { match: ['rdl', 'romanian deadlift'], name: 'Romanian deadlift' },
+      { match: ['single leg rdl'], name: 'Single-leg RDL' },
+      { match: ['deadlift'], name: 'Romanian deadlift' },
+      { match: ['hip thrust'], name: 'Hip thrust' },
+      { match: ['glute bridge'], name: 'Glute bridge' },
+      { match: ['walking lunge'], name: 'Walking lunge' },
+      { match: ['reverse lunge', 'lunge'], name: 'Reverse lunge' },
+      { match: ['step up'], name: 'Step-up' },
+      { match: ['leg press'], name: 'Leg press' },
+      { match: ['leg extension'], name: 'Leg extension' },
+      { match: ['hamstring curl', 'leg curl'], name: 'Lying hamstring curl' },
+      { match: ['calf raise', 'calves'], name: 'Standing calf raise' },
+      { match: ['wall sit'], name: 'Wall sit' },
+      { match: ['hammer curl'], name: 'Hammer curl' },
+      { match: ['incline curl'], name: 'Incline dumbbell curl' },
+      { match: ['concentration curl'], name: 'Concentration curl' },
+      { match: ['bicep curl', 'barbell curl', 'biceps curl'], name: 'Barbell curl' },
+      { match: ['skull crusher', 'skullcrusher', 'lying tricep'], name: 'Skull crusher' },
+      { match: ['tricep pushdown', 'cable pushdown', 'pushdown'], name: 'Triceps pushdown' },
+      { match: ['tricep kickback', 'kickback'], name: 'Triceps kickback' },
+      { match: ['overhead tricep', 'french press'], name: 'Overhead triceps extension' },
+      { match: ['bench dip'], name: 'Bench dip' },
+      { match: ['chest dip', 'dips'], name: 'Chest dip' },
+      { match: ['cable fly', 'flye'], name: 'Cable fly' },
+      { match: ['dumbbell fly'], name: 'Dumbbell fly' },
+      { match: ['cable crunch'], name: 'Cable crunch' },
+      { match: ['bicycle crunch'], name: 'Bicycle crunch' },
+      { match: ['dead bug', 'deadbug'], name: 'Dead bug' },
+      { match: ['hanging knee', 'hanging leg'], name: 'Hanging knee raise' },
+      { match: ['plank'], name: 'Plank' },
+      { match: ['back extension', 'hyperextension'], name: 'Back extension' },
+      { match: ['jumping jack'], name: 'Jumping jack' },
+      { match: ['high knee'], name: 'High knees' },
+      { match: ['mountain climber'], name: 'Mountain climber' },
+      { match: ['burpee'], name: 'Burpee' },
+      { match: ['jump rope'], name: 'Jump rope' },
+      { match: ['jump squat'], name: 'Jump squat' }
+    ];
+
+    for (const item of SPECIFIC) {
+      if (item.match.some(m => clean.includes(m))) {
+        return item.name;
+      }
+    }
+    return raw;
+  }
+
+  if (importCsv) {
+    importCsv.onchange = () => {
+      const file = importCsv.files && importCsv.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const rows = parseCSV(reader.result);
+          if (rows.length < 2) {
+            toast('CSV file is empty or invalid');
+            return;
+          }
+
+          const cols = detectCSVColumns(rows[0]);
+          if (cols.exercise === -1) {
+            toast('Could not find exercise column in CSV');
+            return;
+          }
+
+          const isLbsHeader = rows[0].some(h => /lbs|pounds/i.test(h));
+          const allPrs = prs();
+          const progressData = loadProgress();
+          progressData.sessions = progressData.sessions || [];
+
+          let setsCount = 0;
+          let newPrCount = 0;
+          const workoutGroups = {};
+
+          for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            if (!r || !r[cols.exercise]) continue;
+            const rawEx = r[cols.exercise].trim();
+            if (!rawEx) continue;
+
+            const canonicalEx = matchExerciseName(rawEx);
+            let rawW = cols.weight !== -1 ? parseFloat(r[cols.weight]) : 0;
+            const rawReps = cols.reps !== -1 ? parseInt(r[cols.reps], 10) : 0;
+            if (isNaN(rawW) || rawW < 0) rawW = 0;
+            if (isNaN(rawReps) || rawReps <= 0) continue;
+
+            const unit = cols.weightUnit !== -1 && r[cols.weightUnit] ? r[cols.weightUnit].toLowerCase() : '';
+            const isLbs = unit.includes('lb') || isLbsHeader;
+            const weightKg = isLbs && rawW > 0 ? Math.round(rawW * 0.453592 * 2) / 2 : rawW;
+
+            let rawDate = cols.date !== -1 && r[cols.date] ? r[cols.date].trim() : '';
+            let dateStr = new Date().toISOString().slice(0, 10);
+            if (rawDate) {
+              const dObj = new Date(rawDate.replace(' ', 'T'));
+              if (!isNaN(dObj.getTime())) {
+                dateStr = dObj.toISOString().slice(0, 10);
+              }
+            }
+
+            const wName = cols.workout !== -1 && r[cols.workout] ? r[cols.workout].trim() : 'Workout';
+            const groupKey = dateStr + '|' + wName;
+            workoutGroups[groupKey] = workoutGroups[groupKey] || { date: dateStr, name: wName, moves: new Set() };
+            workoutGroups[groupKey].moves.add(canonicalEx);
+
+            const exRows = allPrs[canonicalEx] || [];
+            const prevBest = best1RM(exRows);
+            const est1rm = estimate1RM(weightKg, rawReps);
+
+            if (est1rm && (!prevBest || est1rm > prevBest.est)) {
+              newPrCount++;
+            }
+
+            allPrs[canonicalEx] = [{ weight: weightKg, reps: rawReps, est: est1rm, date: dateStr }].concat(exRows).slice(0, 40);
+            setsCount++;
+          }
+
+          const sessionKeys = Object.keys(workoutGroups).sort();
+          let addedSessions = 0;
+          sessionKeys.forEach(k => {
+            const grp = workoutGroups[k];
+            const alreadyExists = progressData.sessions.some(s => s.date === grp.date && s.name === grp.name);
+            if (!alreadyExists) {
+              const count = grp.moves.size;
+              progressData.sessions.unshift({
+                name: grp.name,
+                minutes: Math.max(20, count * 7),
+                date: grp.date,
+                done: count,
+                total: count,
+                ts: new Date(grp.date + 'T12:00:00').getTime()
+              });
+              progressData.totalMinutes = (progressData.totalMinutes || 0) + Math.max(20, count * 7);
+              addedSessions++;
+            }
+          });
+
+          saveJSON('form-prs', allPrs);
+          saveProgress(progressData);
+
+          renderProgress();
+          renderPrLog();
+          if (importStatus) {
+            importStatus.innerHTML = '<b style="color:var(--lime)">✓ Imported ' + addedSessions + ' sessions, ' + setsCount + ' sets across ' + Object.keys(allPrs).length + ' movements (' + newPrCount + ' new PRs)!</b>';
+          }
+          toast('✓ Imported ' + addedSessions + ' workouts & ' + setsCount + ' sets!');
+          cueDone();
+        } catch (err) {
+          console.error(err);
+          toast('Failed to parse CSV file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+  }
+
+  // ── P5: Extended Exercise Database (1,324 Movements from openGym) ──
+  const openExtLibBtn = document.getElementById('openExtendedLibrary');
+  const extModal = document.getElementById('extendedModal');
+  const closeExtModalBtn = document.getElementById('closeExtendedModal');
+  const extSearchInput = document.getElementById('extendedSearchInput');
+  const extFilters = document.getElementById('extendedFilters');
+  const extCount = document.getElementById('extendedCount');
+  const extResults = document.getElementById('extendedResults');
+
+  let extData = null;
+  let extCategory = 'all';
+  let extQuery = '';
+  let extLimit = 50;
+
+  async function loadExtendedDB() {
+    if (extData) return extData;
+    try {
+      const res = await fetch('extended-exercises.json');
+      if (res.ok) {
+        extData = await res.json();
+        return extData;
+      }
+    } catch (err) {
+      console.warn('Could not load local extended-exercises.json', err);
+    }
+    return [];
+  }
+
+  function renderExtendedResults() {
+    if (!extResults) return;
+    if (!extData) {
+      extResults.innerHTML = '<div class="micro" style="text-align:center;padding:24px 0">Loading 1,324 movements…</div>';
+      return;
+    }
+
+    const q = extQuery.toLowerCase().trim();
+    const filtered = extData.filter(ex => {
+      if (extCategory !== 'all' && ex.bp !== extCategory) return false;
+      if (!q) return true;
+      const nameMatch = ex.n && ex.n.toLowerCase().includes(q);
+      const targetMatch = ex.tg && ex.tg.toLowerCase().includes(q);
+      const eqMatch = ex.eq && ex.eq.toLowerCase().includes(q);
+      const bpMatch = ex.bp && ex.bp.toLowerCase().includes(q);
+      const smMatch = ex.sm && ex.sm.some(s => s.toLowerCase().includes(q));
+      return nameMatch || targetMatch || eqMatch || bpMatch || smMatch;
+    });
+
+    if (extCount) {
+      extCount.textContent = 'Found ' + filtered.length + ' movements' + (q ? ' matching "' + q + '"' : '');
+    }
+
+    if (!filtered.length) {
+      extResults.innerHTML = '<div class="empty">No movements match those criteria. Try another search term.</div>';
+      return;
+    }
+
+    const visible = filtered.slice(0, extLimit);
+    extResults.innerHTML = visible.map(ex => {
+      const capName = ex.n.charAt(0).toUpperCase() + ex.n.slice(1);
+      const gifUrl = ex.gif ? 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@7455efae41b330c265e7cd4b78dfa848e7ce5ebd/videos/' + ex.gif : '';
+      return '<article class="log-item" style="display:block;padding:12px 14px;border-radius:14px;background:#faf8f2">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">' +
+          '<div>' +
+            '<strong style="font-size:15px">' + capName + '</strong>' +
+            '<div style="display:flex;gap:5px;flex-wrap:wrap;margin:5px 0">' +
+              '<span style="background:var(--ink);color:white;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:900">' + (ex.bp || '').toUpperCase() + '</span>' +
+              '<span style="background:var(--lime);color:var(--dark);padding:2px 7px;border-radius:99px;font-size:9px;font-weight:900">' + (ex.tg || '').toUpperCase() + '</span>' +
+              '<span style="background:#efebe2;color:#444;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:800">' + (ex.eq || '').toUpperCase() + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px">' +
+            '<button type="button" class="chip" onclick="addExtToCustom(\'' + capName.replace(/'/g, "\\'") + '\')" style="font-size:10px;padding:5px 9px;background:var(--ink);color:white">+ ADD MOVE</button>' +
+          '</div>' +
+        '</div>' +
+        (ex.st && ex.st.length ? (
+          '<details style="margin-top:6px;font-size:11px;color:#555">' +
+            '<summary style="cursor:pointer;font-weight:800;color:var(--orange)">View Technique Instructions (' + ex.st.length + ' steps) ▾</summary>' +
+            '<ol style="margin:6px 0 4px;padding-left:18px;line-height:1.45">' +
+              ex.st.map(s => '<li style="margin:3px 0">' + s + '</li>').join('') +
+            '</ol>' +
+            (gifUrl ? '<div style="margin-top:6px"><a href="' + gifUrl + '" target="_blank" rel="noopener noreferrer" style="font-weight:900;color:var(--ink);text-decoration:underline">View Demonstration Animation ↗</a></div>' : '') +
+          '</details>'
+        ) : '') +
+      '</article>';
+    }).join('') + (filtered.length > extLimit ? '<button type="button" class="program-start" onclick="loadMoreExtended()" style="height:40px;font-size:11px;margin-top:8px">SHOW MORE MOVEMENTS (' + (filtered.length - extLimit) + ' MORE) ↓</button>' : '');
+  }
+
+  window.loadMoreExtended = () => {
+    extLimit += 50;
+    renderExtendedResults();
+  };
+
+  window.addExtToCustom = (moveName) => {
+    const builderList = document.getElementById('builderList');
+    if (builderList) {
+      const label = document.createElement('label');
+      label.innerHTML = '<input type="checkbox" value="' + moveName + '" checked> ' + moveName + ' <span class="micro" style="color:var(--orange);font-weight:900">(Database)</span>';
+      builderList.prepend(label);
+      toast('Added "' + moveName + '" to custom session builder');
+    }
+  };
+
+  if (openExtLibBtn) {
+    openExtLibBtn.onclick = async () => {
+      if (extModal) extModal.classList.add('open');
+      if (extSearchInput) extSearchInput.focus();
+      if (!extData) {
+        await loadExtendedDB();
+      }
+      renderExtendedResults();
+    };
+  }
+
+  if (closeExtModalBtn) {
+    closeExtModalBtn.onclick = () => {
+      if (extModal) extModal.classList.remove('open');
+    };
+  }
+
+  if (extModal) {
+    extModal.onclick = (e) => {
+      if (e.target === extModal) extModal.classList.remove('open');
+    };
+  }
+
+  if (extSearchInput) {
+    extSearchInput.oninput = (e) => {
+      extQuery = e.target.value;
+      extLimit = 50;
+      renderExtendedResults();
+    };
+  }
+
+  if (extFilters) {
+    extFilters.onclick = (e) => {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      extFilters.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      extCategory = btn.dataset.cat;
+      extLimit = 50;
+      renderExtendedResults();
+    };
+  }
 })();
 </script>
 </body></html>

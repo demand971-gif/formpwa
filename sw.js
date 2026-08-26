@@ -1,4 +1,4 @@
-const VERSION = 'form-pwa-v4';
+const VERSION = 'form-pwa-v5';
 const SHELL = VERSION + '-shell';
 const MEDIA = VERSION + '-media';
 const PRECACHE = [
