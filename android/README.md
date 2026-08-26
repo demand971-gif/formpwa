@@ -47,7 +47,7 @@ cd android
 
 ### Option 3: Automated via GitHub Actions
 
-This repository includes `.github/workflows/build-apk.yml`. Whenever changes are pushed:
+This repository includes a CI workflow template in `ci/build-apk.yml`. Copy it to `.github/workflows/build-apk.yml` in your repository. Whenever changes are pushed:
 1. GitHub Actions automatically sets up Java 17 and the Android SDK.
 2. Syncs the web assets.
 3. Builds both Debug and Release APKs.

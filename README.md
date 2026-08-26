@@ -16,7 +16,7 @@ It is a private file collection: the training UI, programs, media, and related a
 | `offline.html` | Offline fallback source |
 | `android/` | Android project wrapper (ready for APK packaging) |
 | `build-apk.sh` | Automated build script for Android APK |
-| `.github/workflows/build-apk.yml` | CI workflow to build APKs automatically |
+| `ci/build-apk.yml` | GitHub Actions workflow template to build APKs automatically |
 
 ## Open the files
 
@@ -50,7 +50,7 @@ If you have Java 17 and the Android SDK installed:
 ```
 
 ### 3. Automated via GitHub Actions
-A GitHub Actions workflow is included in `.github/workflows/build-apk.yml`. Pushing to your repository triggers an automated build that generates and uploads downloadable `FORM-debug.apk` and `FORM-release.apk` artifacts under the GitHub repository's **Actions** tab.
+A GitHub Actions workflow template is provided in `ci/build-apk.yml`. Copy it to `.github/workflows/build-apk.yml` in your repository. Whenever pushed, it automatically sets up Java 17 and Android SDK, builds debug and release APKs, and uploads them as downloadable artifacts (`FORM-debug.apk` and `FORM-release.apk`).
 
 ## Data
 
