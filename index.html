@@ -100,7 +100,7 @@
   <div><div class="micro" style="color:#d8ff3e">New in this build</div><strong>Dark mode, custom sessions, PRs, reminders, calendar, backup</strong></div>
   <span style="background:var(--lime);color:var(--dark);border-radius:99px;padding:8px 12px;font-weight:900;font-size:12px">OPEN TOOLS →</span>
 </a>
-<section class="library" id="library"><div class="library-top"><div><div class="micro">Build your session</div><h2 id="libraryTitle">All exercises</h2><div class="micro" id="resultCount" style="margin-top:5px">63 movements</div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="search">⌕<input id="search" placeholder="Search exercise..." /></label><button id="openExtendedLibrary" class="media-tab" type="button" style="background:var(--ink);color:white;font-weight:900;letter-spacing:.3px;padding:9px 13px;white-space:nowrap">+1,300 DATABASE 🔍</button></div></div><div class="filters" id="equipmentFilters"><button class="chip on" data-equipment="All">All equipment</button><button class="chip" data-equipment="Bodyweight">Bodyweight</button><button class="chip" data-equipment="Dumbbells">Dumbbells</button><button class="chip" data-equipment="Cable">Cable</button><button class="chip" data-equipment="Barbell">Barbell</button><button class="chip" data-equipment="Machine">Machine</button></div><div class="cards" id="cards"></div></section></div>
+<section class="library" id="library"><div class="library-top"><div><div class="micro">Build your session</div><h2 id="libraryTitle">All exercises</h2><div class="view-toggle" id="librarySourceToggle" style="margin-top:6px;width:fit-content"><button type="button" class="on" data-source="core">Core (63)</button><button type="button" data-source="extended">All Database (1,324)</button></div></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="search">⌕<input id="search" placeholder="Search exercises, muscles, equipment..." /></label><button id="openExtendedLibrary" class="media-tab" type="button" style="background:var(--ink);color:white;font-weight:900;letter-spacing:.3px;padding:9px 13px;white-space:nowrap">DATABASE MODAL 🔍</button></div></div><div class="filters" id="equipmentFilters"><button class="chip on" data-equipment="All">All equipment</button><button class="chip" data-equipment="Bodyweight">Bodyweight</button><button class="chip" data-equipment="Dumbbells">Dumbbells</button><button class="chip" data-equipment="Cable">Cable</button><button class="chip" data-equipment="Barbell">Barbell</button><button class="chip" data-equipment="Machine">Machine</button></div><div class="cards" id="cards"></div><div id="loadMoreWrap" style="display:none;text-align:center;margin-top:16px"><button id="loadMoreCards" class="program-start" type="button" style="width:min(320px,100%)">LOAD MORE MOVEMENTS ↓</button></div></section></div>
 </section>
 <section class="section" id="plans"><div class="section-head"><div><div class="eyebrow">Trainer-inspired plans</div><h2>Pick your focus.</h2></div><button class="see" id="viewAllPlans" aria-expanded="false">VIEW ALL 50</button></div>
 <div class="program-filters" id="programFilters">
@@ -499,34 +499,175 @@ const timer=document.getElementById('timer');
 const pause=document.getElementById('pause');
 const startWorkout=document.getElementById('startWorkout');
 function mediaSlug(x){return x.name.toLowerCase().replace(/\s+/g,'-')}
-function matchesView(x){const side=exerciseSide[x.name]||'Both';return side==='Both'||side===view}
+let librarySource = 'core'; // 'core' or 'extended'
+let extendedExercisesMapped = [];
+let cardsLimit = 48;
+
+function mapBP(bp, tg) {
+  if (bp === "chest") return "Chest";
+  if (bp === "back") return "Back";
+  if (bp === "upper legs" || bp === "lower legs") return tg === "glutes" ? "Glutes" : "Legs";
+  if (bp === "waist") return "Core";
+  if (bp === "shoulders") return "Shoulders";
+  if (bp === "upper arms" || bp === "lower arms") return tg === "triceps" ? "Triceps" : "Biceps";
+  if (bp === "cardio") return "Cardio";
+  return "Core";
+}
+
+function mapSide(part) {
+  if (part === "Chest" || part === "Core" || part === "Biceps") return "Front";
+  if (part === "Back" || part === "Triceps" || part === "Glutes") return "Back";
+  return "Both";
+}
+
+function mapEQ(eq) {
+  const e = (eq || "").toLowerCase();
+  if (e.includes("body") || e.includes("assisted")) return "Bodyweight";
+  if (e.includes("dumbbell")) return "Dumbbells";
+  if (e.includes("barbell") || e.includes("weighted") || e.includes("olympic")) return "Barbell";
+  if (e.includes("cable")) return "Cable";
+  if (e.includes("machine") || e.includes("sled") || e.includes("trainer") || e.includes("bike")) return "Machine";
+  return "Dumbbells";
+}
+
+async function initExtendedLibrary() {
+  if (extendedExercisesMapped.length) return extendedExercisesMapped;
+  try {
+    const res = await fetch('extended-exercises.json');
+    if (!res.ok) return [];
+    const db = await res.json();
+    extendedExercisesMapped = db.map(ex => {
+      const capName = ex.n.charAt(0).toUpperCase() + ex.n.slice(1);
+      const part = mapBP(ex.bp, ex.tg);
+      return {
+        name: capName,
+        part,
+        eq: mapEQ(ex.eq),
+        level: "All levels",
+        icon: "🏋️",
+        color: "#d8ff3e",
+        cues: (ex.st && ex.st.length) ? ex.st : ["Perform with steady control.", "Breathe through full range of motion."],
+        imgUrl: ex.img ? 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@7455efae41b330c265e7cd4b78dfa848e7ce5ebd/images/' + ex.img : '',
+        gifUrl: ex.gif ? 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@7455efae41b330c265e7cd4b78dfa848e7ce5ebd/videos/' + ex.gif : '',
+        side: mapSide(part),
+        isExtended: true
+      };
+    });
+    return extendedExercisesMapped;
+  } catch (e) {
+    console.warn("Could not load extended-exercises.json", e);
+    return [];
+  }
+}
+
+function getActiveExerciseList() {
+  return librarySource === 'extended' ? extendedExercisesMapped : exercises;
+}
+
+function matchesView(x){
+  const side = x.side || exerciseSide[x.name] || 'Both';
+  return side === 'Both' || side === view;
+}
+
 function render(){
- const list=exercises.filter(x=>matchesView(x)&&(part==='All'||x.part===part)&&(equipment==='All'||x.eq===equipment)&&x.name.toLowerCase().includes(query));
- libraryTitle.textContent=part==='All'?(view+' exercises'):(part+' exercises');
- resultCount.textContent=list.length+' movement'+(list.length===1?'':'s')+' shown';
- cards.innerHTML=list.length?list.map(x=>`<article class="exercise" data-name="${x.name}" tabindex="0" role="button" aria-label="View coaching instructions for ${x.name}"><button class="fav ${saved.has(x.name)?'saved':''}" data-fav="${x.name}" aria-label="Save">${saved.has(x.name)?'♥':'♡'}</button><div class="exercise-thumb"><img src="media/exercises/${mediaSlug(x)}.png" alt="${x.name} exercise illustration" loading="lazy"></div><h3>${x.name}</h3><p>${x.part} · ${x.eq}</p><span class="coach-link">VIEW COACHING →</span></article>`).join(''):'<div class="empty">No exercises match those filters. Try another equipment option.</div>'
+ const activeList = getActiveExerciseList();
+ const list = activeList.filter(x => matchesView(x) && (part === 'All' || x.part === part) && (equipment === 'All' || x.eq === equipment) && x.name.toLowerCase().includes(query));
+ libraryTitle.textContent = part === 'All' ? (view + ' exercises') : (part + ' exercises');
+ const countLabel = list.length + ' movement' + (list.length === 1 ? '' : 's') + ' shown' + (librarySource === 'extended' ? ' (1,324 db)' : '');
+ if (resultCount) resultCount.textContent = countLabel;
+ const visible = (librarySource === 'extended') ? list.slice(0, cardsLimit) : list;
+
+ cards.innerHTML = visible.length ? visible.map(x => {
+   const thumb = x.imgUrl ? x.imgUrl : `media/exercises/${mediaSlug(x)}.png`;
+   return `<article class="exercise" data-name="${x.name}" tabindex="0" role="button" aria-label="View coaching instructions for ${x.name}"><button class="fav ${saved.has(x.name)?'saved':''}" data-fav="${x.name}" aria-label="Save">${saved.has(x.name)?'♥':'♡'}</button><div class="exercise-thumb"><img src="${thumb}" alt="${x.name} exercise illustration" loading="lazy"></div><h3>${x.name}</h3><p>${x.part} · ${x.eq}</p><span class="coach-link">VIEW COACHING →</span></article>`;
+ }).join('') : '<div class="empty">No exercises match those filters. Try another equipment option.</div>';
+
+ const loadMoreWrap = document.getElementById('loadMoreWrap');
+ if (loadMoreWrap) {
+   loadMoreWrap.style.display = (librarySource === 'extended' && list.length > cardsLimit) ? 'block' : 'none';
+   const btn = document.getElementById('loadMoreCards');
+   if (btn) btn.textContent = 'LOAD MORE MOVEMENTS (' + (list.length - cardsLimit) + ' MORE) ↓';
+ }
 }
 render();
+
+const libToggle = document.getElementById('librarySourceToggle');
+if (libToggle) {
+  libToggle.onclick = async (e) => {
+    const btn = e.target.closest('[data-source]');
+    if (!btn) return;
+    libToggle.querySelectorAll('[data-source]').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    librarySource = btn.dataset.source;
+    cardsLimit = 48;
+    if (librarySource === 'extended' && !extendedExercisesMapped.length) {
+      toast('Loading 1,324 movement database…');
+      await initExtendedLibrary();
+    }
+    render();
+    toast(librarySource === 'extended' ? 'Loaded all 1,324 exercises' : 'Switched to core library');
+  };
+}
+
+const loadMoreCardsBtn = document.getElementById('loadMoreCards');
+if (loadMoreCardsBtn) {
+  loadMoreCardsBtn.onclick = () => {
+    cardsLimit += 48;
+    render();
+  };
+}
+
 function renderLabels(){document.getElementById('bodyLabels').innerHTML=labelsByView[view].map(p=>`<button type="button" data-part="${p}" class="${p===part?'on':''}">${p}</button>`).join('');document.querySelectorAll('.muscle').forEach(el=>el.classList.toggle('active',part!=='All'&&el.dataset.part===part));const hint=document.getElementById('viewHint');if(hint)hint.textContent=view+' muscles'}
 function setBodyView(next,resetPart=true){if(next!=='Front'&&next!=='Back')return;view=next;if(resetPart){part='All';equipment='All';document.querySelectorAll('[data-equipment]').forEach((x,i)=>x.classList.toggle('on',i===0))}document.querySelectorAll('.view-toggle [data-view]').forEach(x=>{const on=x.dataset.view===view;x.classList.toggle('on',on);x.setAttribute('aria-pressed',on?'true':'false')});document.getElementById('frontMap').hidden=view!=='Front';document.getElementById('backMap').hidden=view!=='Back';renderLabels();if(resetPart){render();document.getElementById('library').scrollIntoView({behavior:'smooth',block:'start'});toast(view+' muscles loaded')}}
 function choosePart(p){if(p==='Chest'||p==='Core'||p==='Biceps'){if(view!=='Front')setBodyView('Front',false)}if(p==='Back'||p==='Glutes'||p==='Triceps'){if(view!=='Back')setBodyView('Back',false)}part=p;equipment='All';document.querySelectorAll('[data-equipment]').forEach((x,i)=>x.classList.toggle('on',i===0));renderLabels();render();document.getElementById('library').scrollIntoView({behavior:'smooth',block:'start'});toast((p==='All'?view:p)+' exercises loaded')}
 document.getElementById('bodyLabels').onclick=e=>{if(e.target.dataset.part)choosePart(e.target.dataset.part)};
 document.getElementById('figureWrap').onclick=e=>{if(e.target.dataset.part)choosePart(e.target.dataset.part)};
 document.getElementById('equipmentFilters').onclick=e=>{if(!e.target.dataset.equipment)return;equipment=e.target.dataset.equipment;document.querySelectorAll('[data-equipment]').forEach(x=>x.classList.toggle('on',x===e.target));render()};
-document.getElementById('search').oninput=e=>{query=e.target.value.toLowerCase();render()};
-cards.onclick=e=>{const f=e.target.closest('[data-fav]');if(f){e.stopPropagation();saved.has(f.dataset.fav)?saved.delete(f.dataset.fav):saved.add(f.dataset.fav);localStorage.setItem('form-favs',JSON.stringify([...saved]));toast(saved.has(f.dataset.fav)?'Saved to favorites':'Removed from favorites');render();return}const card=e.target.closest('.exercise');if(card)openExercise(exercises.find(x=>x.name===card.dataset.name))};
-let currentMediaSlug='goblet-squat',currentExerciseName='Exercise';
+document.getElementById('search').oninput=e=>{query=e.target.value.toLowerCase();cardsLimit=48;render()};
+
+cards.onclick=e=>{
+  const f=e.target.closest('[data-fav]');
+  if(f){
+    e.stopPropagation();
+    saved.has(f.dataset.fav)?saved.delete(f.dataset.fav):saved.add(f.dataset.fav);
+    localStorage.setItem('form-favs',JSON.stringify([...saved]));
+    toast(saved.has(f.dataset.fav)?'Saved to favorites':'Removed from favorites');
+    render();
+    return;
+  }
+  const card=e.target.closest('.exercise');
+  if(card){
+    const activeList = getActiveExerciseList();
+    const found = activeList.find(x=>x.name===card.dataset.name) || exercises.find(x=>x.name===card.dataset.name) || (extendedExercisesMapped&&extendedExercisesMapped.find(x=>x.name===card.dataset.name));
+    if(found) openExercise(found);
+  }
+};
+
+let currentMediaSlug='goblet-squat',currentExerciseName='Exercise',currentExerciseObj=null;
 function showMedia(type){
  document.querySelectorAll('.media-tab').forEach(b=>b.classList.toggle('on',b.dataset.media===type));
+ if (currentExerciseObj && currentExerciseObj.isExtended) {
+   const img = currentExerciseObj.imgUrl || '';
+   const gif = currentExerciseObj.gifUrl || '';
+   if(type==='picture') modalIcon.innerHTML=`<img src="${img}" alt="${currentExerciseName} form illustration"><span class="media-note">POSITION GUIDE</span>`;
+   if(type==='gif' || type==='video') modalIcon.innerHTML=`<img src="${gif}" alt="Animated ${currentExerciseName} demonstration"><span class="media-note">ANIMATED FORM GUIDE</span>`;
+   return;
+ }
  const base='media/exercises/'+currentMediaSlug;
  if(type==='picture') modalIcon.innerHTML=`<img src="${base}.png" alt="${currentExerciseName} form illustration"><span class="media-note">POSITION GUIDE</span>`;
  if(type==='gif') modalIcon.innerHTML=`<img src="${base}.gif" alt="Animated ${currentExerciseName} demonstration"><span class="media-note">ANIMATED FORM GUIDE</span>`;
  if(type==='video') modalIcon.innerHTML=`<video src="${base}.mp4" autoplay muted loop playsinline controls aria-label="${currentExerciseName} video illustration"></video>`;
 }
 mediaTabs.onclick=e=>{if(e.target.dataset.media)showMedia(e.target.dataset.media)};
+
 function openExercise(x){
+ currentExerciseObj = x;
  currentMediaSlug=mediaSlug(x);currentExerciseName=x.name;
- modalTitle.textContent=x.name;modalIcon.style.background=x.color;modalMeta.innerHTML=`<span>${x.part}</span><span>${x.eq}</span><span>${x.level}</span>`;modalCues.innerHTML=x.cues.map(c=>`<li>${c}</li>`).join('');const yt=youtubeFor(x.name);modalYoutube.href=yt.url;modalYoutube.innerHTML=`<span class="youtube-icon">▶</span>${yt.title.toUpperCase()} ↗`;
+ modalTitle.textContent=x.name;modalIcon.style.background=x.color||'#d8ff3e';modalMeta.innerHTML=`<span>${x.part}</span><span>${x.eq}</span><span>${x.level||'All levels'}</span>`;
+ const cuesList = (x.cues && x.cues.length) ? x.cues : ['Move slowly and stay in control.','Maintain steady breathing throughout range of motion.'];
+ modalCues.innerHTML=cuesList.map(c=>`<li>${c}</li>`).join('');
+ const yt=youtubeVideos[x.name]||{url:'https://www.youtube.com/results?search_query='+encodeURIComponent(x.name+' exercise proper form tutorial'),title:'Search '+x.name+' Tutorial'};
+ modalYoutube.href=yt.url;modalYoutube.innerHTML=`<span class="youtube-icon">▶</span>${yt.title.toUpperCase()} ↗`;
  const plateToggle=document.getElementById('modalPlateToggle');
  if(plateToggle) plateToggle.style.display=(x.eq==='Barbell')?'inline-block':'none';
  const plateDrawer=document.getElementById('modalPlateDrawer');
