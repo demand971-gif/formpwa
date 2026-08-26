@@ -207,6 +207,31 @@
 <div class="micro" style="margin:10px 0 6px">Training load percentages (% of 1RM)</div>
 <div id="calcPercentages" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;font-size:11px"></div>
 </article>
+<article class="studio-card"><h3>Plate Calculator</h3>
+<p class="micro">Olympic barbell loader & warm-up ladder. Calculates plates needed per side.</p>
+<div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+<input class="field" id="plateTarget" placeholder="Target weight (kg)" value="100" inputmode="decimal" style="margin:0;flex:1">
+<select class="field" id="plateBar" style="margin:0;width:130px">
+<option value="20" selected>20 kg bar</option>
+<option value="15">15 kg bar</option>
+<option value="10">10 kg bar</option>
+</select>
+</div>
+<div style="display:flex;gap:6px;margin:8px 0;flex-wrap:wrap">
+<button class="chip" type="button" onclick="adjustPlateTarget(-10)">-10 kg</button>
+<button class="chip" type="button" onclick="adjustPlateTarget(-2.5)">-2.5 kg</button>
+<button class="chip" type="button" onclick="adjustPlateTarget(2.5)">+2.5 kg</button>
+<button class="chip" type="button" onclick="adjustPlateTarget(10)">+10 kg</button>
+</div>
+<div style="background:var(--dark);border-radius:14px;padding:14px;margin:10px 0;text-align:center">
+<div class="micro" style="color:#a8aa9f;margin-bottom:8px">EACH SIDE OF BARBELL</div>
+<div id="plateGraphic" style="display:flex;align-items:center;justify-content:center;gap:3px;min-height:76px;padding:6px 0"></div>
+<div id="platePerSideText" style="font-size:22px;font-weight:950;color:var(--lime);margin-top:6px">40 kg / side</div>
+<div id="plateListText" class="micro" style="color:#eee">1×25kg · 1×15kg</div>
+</div>
+<div class="micro" style="margin:10px 0 6px">Warm-up progression ramp</div>
+<div id="plateWarmupLadder" style="display:grid;gap:5px;font-size:11px"></div>
+</article>
 <article class="studio-card"><h3>Backup</h3>
 <p class="micro">Download your log, PRs, favorites and schedule. Import to restore.</p>
 <button class="program-start" id="exportData" type="button">DOWNLOAD BACKUP</button>
@@ -236,11 +261,17 @@
 <nav class="mobile-nav"><button onclick="location.hash='train'">⌂</button><button onclick="location.hash='library'">◫</button><button onclick="location.hash='plans'">◎</button><button onclick="location.hash='progress'">◉</button></nav>
 </div>
 <div class="modal" id="modal"><div class="sheet"><button class="close" id="closeModal">×</button><div class="micro">Exercise guide</div><h2 id="modalTitle">Goblet squat</h2><div class="detail-meta" id="modalMeta"></div><div class="media-tabs" id="mediaTabs" style="display:none"><button class="media-tab on" data-media="picture">PICTURE</button><button class="media-tab" data-media="gif">GIF</button><button class="media-tab" data-media="video">VIDEO</button></div><div class="demo" id="modalIcon">🏋️</div><div class="cues"><div class="micro">Coach cues</div><ul id="modalCues"></ul><a class="youtube-link" id="modalYoutube" href="#" target="_blank" rel="noopener noreferrer"><span class="youtube-icon">▶</span>WATCH FORM VIDEOS ON YOUTUBE ↗</a>
-<div class="pr-box"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div class="micro">Log a set / 1RM PR</div><span class="micro" id="pr1rmBadge" style="display:none;background:var(--lime);color:var(--dark);padding:3px 9px;border-radius:99px;font-weight:900;letter-spacing:.3px"></span></div>
+<div class="pr-box"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div class="micro">Log a set / 1RM PR</div><div style="display:flex;gap:6px;align-items:center"><button type="button" id="modalPlateToggle" class="media-tab" style="display:none;padding:3px 9px;font-size:10px">PLATES 🏋️</button><span class="micro" id="pr1rmBadge" style="display:none;background:var(--lime);color:var(--dark);padding:3px 9px;border-radius:99px;font-weight:900;letter-spacing:.3px"></span></div></div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
 <input class="field" id="prWeight" placeholder="Weight (kg)" inputmode="decimal" style="margin:0;flex:1;min-width:90px">
 <input class="field" id="prReps" placeholder="Reps" inputmode="numeric" style="margin:0;flex:1;min-width:70px">
 <button class="theme-btn" id="savePr" type="button">SAVE SET</button>
+</div>
+<div id="modalPlateDrawer" style="display:none;margin-top:10px;padding:12px;border-radius:14px;background:var(--dark);color:white">
+<div style="display:flex;justify-content:space-between;align-items:center"><div class="micro" style="color:var(--lime)">BARBELL PLATE LOADER</div><button type="button" id="closeModalPlate" style="border:0;background:transparent;color:white;cursor:pointer;font-weight:900">✕</button></div>
+<div id="modalPlateGraphic" style="display:flex;align-items:center;justify-content:center;gap:3px;min-height:56px;padding:6px 0"></div>
+<div id="modalPlateText" style="font-size:16px;font-weight:950;text-align:center;color:var(--lime)"></div>
+<div id="modalPlateList" class="micro" style="text-align:center;color:#eee;margin-top:2px"></div>
 </div>
 <div id="prLiveCalc" class="micro" style="margin-top:6px;min-height:16px;color:var(--muted)"></div>
 <div class="micro" id="prBest" style="margin-top:6px">No sets logged yet</div>
@@ -470,6 +501,10 @@ mediaTabs.onclick=e=>{if(e.target.dataset.media)showMedia(e.target.dataset.media
 function openExercise(x){
  currentMediaSlug=mediaSlug(x);currentExerciseName=x.name;
  modalTitle.textContent=x.name;modalIcon.style.background=x.color;modalMeta.innerHTML=`<span>${x.part}</span><span>${x.eq}</span><span>${x.level}</span>`;modalCues.innerHTML=x.cues.map(c=>`<li>${c}</li>`).join('');const yt=youtubeFor(x.name);modalYoutube.href=yt.url;modalYoutube.innerHTML=`<span class="youtube-icon">▶</span>${yt.title.toUpperCase()} ↗`;
+ const plateToggle=document.getElementById('modalPlateToggle');
+ if(plateToggle) plateToggle.style.display=(x.eq==='Barbell')?'inline-block':'none';
+ const plateDrawer=document.getElementById('modalPlateDrawer');
+ if(plateDrawer) plateDrawer.style.display='none';
  mediaTabs.style.display='flex';modalIcon.classList.add('has-media');showMedia('picture');modal.classList.add('open')
 }
 closeModal.onclick=()=>modal.classList.remove('open');modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};
@@ -1062,6 +1097,189 @@ document.addEventListener('click',()=>{if(soundOn)ensureAudio()},{once:true});
   if (calcWeight) calcWeight.oninput = render1rmCalculator;
   if (calcReps) calcReps.oninput = render1rmCalculator;
   render1rmCalculator();
+
+  // ── P2: Barbell Plate Calculator & Warm-Up Progression Ladder ──
+  const PLATE_SPECS = [
+    { weight: 25, color: '#ef476f', text: '#fff', height: 72, width: 14, name: '25 kg' },
+    { weight: 20, color: '#118ab2', text: '#fff', height: 72, width: 13, name: '20 kg' },
+    { weight: 15, color: '#ffd166', text: '#111', height: 64, width: 12, name: '15 kg' },
+    { weight: 10, color: '#06d6a0', text: '#111', height: 56, width: 11, name: '10 kg' },
+    { weight: 5, color: '#ffffff', text: '#111', height: 48, width: 10, name: '5 kg' },
+    { weight: 2.5, color: '#2b2d42', text: '#fff', height: 40, width: 9, name: '2.5 kg' },
+    { weight: 1.25, color: '#8d99ae', text: '#fff', height: 34, width: 8, name: '1.25 kg' }
+  ];
+
+  function calcPlates(target, bar = 20) {
+    const t = Number(target);
+    const b = Number(bar);
+    if (!isFinite(t) || t <= 0) return { ok: false, msg: 'Enter target weight > 0' };
+    if (t < b) return { ok: false, msg: 'Target weight is less than empty bar (' + b + ' kg)' };
+    const rem = t - b;
+    let perSide = rem / 2;
+    const plates = [];
+    PLATE_SPECS.forEach(spec => {
+      const count = Math.floor(perSide / spec.weight);
+      if (count > 0) {
+        for (let i = 0; i < count; i++) {
+          plates.push(spec);
+        }
+        perSide = Math.round((perSide - count * spec.weight) * 100) / 100;
+      }
+    });
+
+    return {
+      ok: true,
+      target: t,
+      bar: b,
+      perSideTotal: (t - b) / 2,
+      plates,
+      remainder: perSide
+    };
+  }
+
+  function renderPlateVisualHTML(plates, scale = 1) {
+    if (!plates || !plates.length) {
+      return '<div style="display:flex;align-items:center;color:#888;font-size:12px;height:72px">Empty bar · no plates needed</div>';
+    }
+    let html = '<div style="display:flex;align-items:center;background:#171816;padding:4px 8px;border-radius:10px">';
+    html += '<div style="width:20px;height:12px;background:#777;border-radius:2px"></div>';
+    html += '<div style="width:10px;height:52px;background:#aaa;border-radius:3px;border:1px solid #555;margin-right:4px"></div>';
+    plates.forEach(p => {
+      const h = Math.round(p.height * scale);
+      const w = Math.round(p.width * scale);
+      const fs = p.weight >= 10 ? '9px' : '7px';
+      html += '<div style="width:' + w + 'px;height:' + h + 'px;background:' + p.color + ';color:' + p.text + ';border-radius:3px;border:1px solid rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-size:' + fs + ';font-weight:900;writing-mode:vertical-rl;text-orientation:mixed;user-select:none;box-shadow:inset 0 0 3px rgba(0,0,0,0.3)" title="' + p.name + '">' +
+        p.weight +
+      '</div>';
+    });
+    html += '<div style="width:14px;height:12px;background:#777;border-radius:2px;margin-left:3px"></div>';
+    html += '</div>';
+    return html;
+  }
+
+  function formatPlatesSummary(plates) {
+    if (!plates || !plates.length) return 'Bar only';
+    const counts = {};
+    plates.forEach(p => { counts[p.weight] = (counts[p.weight] || 0) + 1; });
+    return Object.entries(counts)
+      .sort((a, b) => Number(b[0]) - Number(a[0]))
+      .map(([w, c]) => c + ' × ' + w + 'kg')
+      .join(' · ');
+  }
+
+  // Studio Plate Calculator bindings
+  const plateTargetInput = document.getElementById('plateTarget');
+  const plateBarSelect = document.getElementById('plateBar');
+  const plateGraphic = document.getElementById('plateGraphic');
+  const platePerSideText = document.getElementById('platePerSideText');
+  const plateListText = document.getElementById('plateListText');
+  const plateWarmupLadder = document.getElementById('plateWarmupLadder');
+
+  function renderStudioPlateCalc() {
+    if (!plateTargetInput || !plateBarSelect) return;
+    const target = parseFloat(plateTargetInput.value) || 0;
+    const bar = parseFloat(plateBarSelect.value) || 20;
+    const res = calcPlates(target, bar);
+
+    if (!res.ok) {
+      if (plateGraphic) plateGraphic.innerHTML = '<div style="color:var(--orange);font-size:12px;padding:12px 0">' + res.msg + '</div>';
+      if (platePerSideText) platePerSideText.textContent = '—';
+      if (plateListText) plateListText.textContent = '';
+      if (plateWarmupLadder) plateWarmupLadder.innerHTML = '';
+      return;
+    }
+
+    if (plateGraphic) plateGraphic.innerHTML = renderPlateVisualHTML(res.plates, 1);
+    if (platePerSideText) {
+      platePerSideText.textContent = res.perSideTotal + ' kg / side' + (res.remainder > 0 ? ' (+' + (res.remainder * 2) + 'kg unmatchable)' : '');
+    }
+    if (plateListText) plateListText.textContent = formatPlatesSummary(res.plates);
+
+    if (plateWarmupLadder) {
+      const warmupSteps = [
+        { label: 'Bar Warmup', pct: 0, weight: bar, reps: '10 reps' },
+        { label: 'Warmup 1', pct: 0.50, weight: Math.max(bar, Math.round((target * 0.50) / 2.5) * 2.5), reps: '5 reps' },
+        { label: 'Warmup 2', pct: 0.70, weight: Math.max(bar, Math.round((target * 0.70) / 2.5) * 2.5), reps: '3 reps' },
+        { label: 'Potentiation', pct: 0.85, weight: Math.max(bar, Math.round((target * 0.85) / 2.5) * 2.5), reps: '1 rep' },
+        { label: 'Working Set', pct: 1.00, weight: target, reps: 'Work reps' }
+      ];
+
+      const seen = new Set();
+      const uniqueSteps = warmupSteps.filter(s => {
+        if (seen.has(s.weight)) return false;
+        seen.add(s.weight);
+        return true;
+      });
+
+      plateWarmupLadder.innerHTML = uniqueSteps.map(s => {
+        const stepPlates = calcPlates(s.weight, bar);
+        const summary = stepPlates.ok ? formatPlatesSummary(stepPlates.plates) : '—';
+        const isWork = s.pct === 1.00;
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;background:' + (isWork ? 'var(--dark)' : '#faf8f2') + ';color:' + (isWork ? 'white' : 'var(--ink)') + ';border:1px solid var(--line)">' +
+          '<div>' +
+            '<strong>' + s.label + ': ' + s.weight + ' kg</strong>' +
+            '<div class="micro" style="color:' + (isWork ? '#aaa' : 'var(--muted)') + '">' + summary + '</div>' +
+          '</div>' +
+          '<div style="font-weight:900;color:' + (isWork ? 'var(--lime)' : 'var(--orange)') + '">' + s.reps + '</div>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  window.adjustPlateTarget = (delta) => {
+    if (!plateTargetInput) return;
+    const cur = parseFloat(plateTargetInput.value) || 20;
+    plateTargetInput.value = Math.max(10, Math.round((cur + delta) * 10) / 10);
+    renderStudioPlateCalc();
+  };
+
+  if (plateTargetInput) plateTargetInput.oninput = renderStudioPlateCalc;
+  if (plateBarSelect) plateBarSelect.onchange = renderStudioPlateCalc;
+  renderStudioPlateCalc();
+
+  // Modal Plate Drawer Logic
+  const modalPlateToggle = document.getElementById('modalPlateToggle');
+  const modalPlateDrawer = document.getElementById('modalPlateDrawer');
+  const closeModalPlate = document.getElementById('closeModalPlate');
+  const modalPlateGraphic = document.getElementById('modalPlateGraphic');
+  const modalPlateText = document.getElementById('modalPlateText');
+  const modalPlateList = document.getElementById('modalPlateList');
+
+  function updateModalPlates() {
+    if (!modalPlateDrawer || modalPlateDrawer.style.display === 'none') return;
+    const w = parseFloat(prWeightIn ? prWeightIn.value : 0) || 100;
+    const res = calcPlates(w, 20);
+    if (!res.ok) {
+      if (modalPlateGraphic) modalPlateGraphic.innerHTML = '<div style="color:var(--orange);font-size:12px;padding:8px 0">' + res.msg + '</div>';
+      if (modalPlateText) modalPlateText.textContent = w + ' kg';
+      if (modalPlateList) modalPlateList.textContent = '';
+      return;
+    }
+    if (modalPlateGraphic) modalPlateGraphic.innerHTML = renderPlateVisualHTML(res.plates, 0.85);
+    if (modalPlateText) modalPlateText.textContent = res.target + ' kg total · ' + res.perSideTotal + ' kg / side';
+    if (modalPlateList) modalPlateList.textContent = formatPlatesSummary(res.plates);
+  }
+
+  if (modalPlateToggle) {
+    modalPlateToggle.onclick = () => {
+      if (!modalPlateDrawer) return;
+      const isOpen = modalPlateDrawer.style.display === 'block';
+      modalPlateDrawer.style.display = isOpen ? 'none' : 'block';
+      if (!isOpen) updateModalPlates();
+    };
+  }
+  if (closeModalPlate) {
+    closeModalPlate.onclick = () => {
+      if (modalPlateDrawer) modalPlateDrawer.style.display = 'none';
+    };
+  }
+  if (prWeightIn) {
+    const origInput = prWeightIn.oninput;
+    prWeightIn.oninput = () => {
+      if (origInput) origInput();
+      updateModalPlates();
+    };
+  }
 
   // reminders
   function nextRemindDelay(hhmm){
