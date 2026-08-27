@@ -10,11 +10,11 @@ function GymNameForm() {
     <form
       onSubmit={handleSubmit}
       style={{
-        maxWidth: 300,
+        maxWidth: '300px',
         margin: '2rem auto',
-        padding: 1rem,
+        padding: '1rem',
         border: '1px solid #ccc',
-        borderRadius: 8,
+        borderRadius: '8px',
       }}
     >
       <h2>Create Gym App</h2>
