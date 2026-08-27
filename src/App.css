@@ -1,0 +1,23 @@
+/* Stopper bars – fixed thin bars on left & right edges */
+.left-stopper, .right-stopper {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: #111;
+  z-index: 1000;
+}
+.left-stopper { left: 0; }
+.right-stopper { right: 0; }
+
+/* Overall app container – hides horizontal overflow */
+.app { overflow: hidden; }
+
+/* Content area – inset by the stopper width */
+.content {
+  margin-left: 22px;
+  margin-right: 22px;
+}
+
+/* Make sure inner components fill the available width */
+.gym-name-form, .exercise-library { width: 100%; }
