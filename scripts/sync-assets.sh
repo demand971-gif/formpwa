@@ -4,20 +4,17 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ASSETS_DIR="$ROOT_DIR/android/app/src/main/assets"
 
-echo "==> Syncing web assets to Android project..."
+echo "==> Building web app (Vite + React)..."
+cd "$ROOT_DIR"
+if [ ! -d node_modules ]; then
+  echo "==> Installing npm dependencies..."
+  npm ci --no-fund --no-audit
+fi
+npm run build
+
+echo "==> Syncing dist/ to Android assets..."
+rm -rf "$ASSETS_DIR"
 mkdir -p "$ASSETS_DIR"
-
-# Copy root web files
-cp -f "$ROOT_DIR/index.html" "$ASSETS_DIR/"
-cp -f "$ROOT_DIR/offline.html" "$ASSETS_DIR/"
-cp -f "$ROOT_DIR/manifest.json" "$ASSETS_DIR/"
-cp -f "$ROOT_DIR/manifest.webmanifest" "$ASSETS_DIR/"
-cp -f "$ROOT_DIR/sw.js" "$ASSETS_DIR/"
-cp -f "$ROOT_DIR/extended-exercises.json" "$ASSETS_DIR/"
-
-# Sync directories
-rm -rf "$ASSETS_DIR/icons" "$ASSETS_DIR/media"
-cp -r "$ROOT_DIR/icons" "$ASSETS_DIR/"
-cp -r "$ROOT_DIR/media" "$ASSETS_DIR/"
+cp -r "$ROOT_DIR/dist/." "$ASSETS_DIR/"
 
 echo "==> Web assets successfully synced to $ASSETS_DIR"

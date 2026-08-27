@@ -10,10 +10,18 @@ echo " FORM — Build Android APK"
 echo " Build Type: $BUILD_TYPE"
 echo "=========================================="
 
-# 1. Sync latest web assets into Android project
+# 1. Check for Node.js
+if ! command -v node >/dev/null 2>&1; then
+    echo ""
+    echo "[!] Error: 'node' is not found in PATH."
+    echo "    Please install Node.js 20 or higher to build the APK."
+    exit 1
+fi
+
+# 2. Build the web app (Vite) and sync dist/ into Android assets
 "$ROOT_DIR/scripts/sync-assets.sh"
 
-# 2. Check for Java
+# 3. Check for Java
 if ! command -v java >/dev/null 2>&1; then
     echo ""
     echo "[!] Error: 'java' is not found in PATH."
@@ -23,7 +31,7 @@ if ! command -v java >/dev/null 2>&1; then
     exit 1
 fi
 
-# 3. Check for Android SDK
+# 4. Check for Android SDK
 if [ -z "${ANDROID_HOME:-}" ] && [ -z "${ANDROID_SDK_ROOT:-}" ]; then
     # Try standard locations
     if [ -d "$HOME/Android/Sdk" ]; then
@@ -37,7 +45,7 @@ if [ -z "${ANDROID_HOME:-}" ] && [ -z "${ANDROID_SDK_ROOT:-}" ]; then
     fi
 fi
 
-# 4. Build APK with Gradle
+# 5. Build APK with Gradle
 cd "$ANDROID_DIR"
 chmod +x gradlew
 
