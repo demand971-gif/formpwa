@@ -1,16 +1,16 @@
-/* Stopper bars – fixed thin bars on left & right edges */
+/* Invisible stopper bars on left & right edges – they reserve space but are not visible */
 .left-stopper, .right-stopper {
   position: fixed;
   top: 0;
   bottom: 0;
   width: 20px;
-  background: #111;
+  background: transparent;
   z-index: 1000;
 }
 .left-stopper { left: 0; }
 .right-stopper { right: 0; }
 
-/* Overall app container – hides horizontal overflow */
+/* Overall app container – prevents horizontal overflow */
 .app { overflow: hidden; }
 
 /* Content area – inset by the stopper width */
