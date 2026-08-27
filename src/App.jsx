@@ -381,11 +381,17 @@ export default function App() {
   }
 
   // ── service worker / offline ──
-  const [swNote, setSwNote] = useState('Service worker: registering…')
+  // Inside the Android APK the page lives on the virtual appassets host —
+  // service-worker fetches there go to the real network (not intercepted) and
+  // always fail, which silently breaks module loading. Skip the SW in the
+  // WebView; assets are bundled in the APK so offline works anyway.
+  const isWebViewAsset = location.hostname === 'appassets.androidplatform.net'
+  const [swNote, setSwNote] = useState(isWebViewAsset ? 'Offline-ready · all assets bundled in the app' : 'Service worker: registering…')
   const [updateShow, setUpdateShow] = useState(false)
   const [offline, setOffline] = useState(!navigator.onLine)
   const [savingOffline, setSavingOffline] = useState(false)
   useEffect(() => {
+    if (isWebViewAsset) return
     if (!('serviceWorker' in navigator)) {
       setSwNote('This browser does not support service workers.')
       return
@@ -546,7 +552,7 @@ export default function App() {
       />
 
       <footer className="footer">
-        <div>FORM v2.1 © 2026 · TRAIN WITH INTENTION</div>
+        <div>FORM v2.2 © 2026 · TRAIN WITH INTENTION</div>
         <div>Exercise guidance is educational. Stop if you feel pain and consult a qualified professional when needed.</div>
       </footer>
 

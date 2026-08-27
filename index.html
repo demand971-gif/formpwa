@@ -14,35 +14,81 @@
 <title>FORM — Train with intention</title>
 <style>html,body{background:#f5f1e8;margin:0}</style>
 <script>
-// Boot watchdog: if the app fails to start, show WHY on screen instead of a blank page.
+// Boot watchdog v2: self-rescue + full on-screen diagnostics if the app fails to start.
 (function () {
+  var BUNDLE = 'assets/index.js';
+  var fetchReport = 'pending';
+  var diagEl = null;
+  function reportResources() {
+    var out = 'Resources loaded on this page:';
+    try {
+      var entries = performance.getEntriesByType('resource');
+      if (!entries.length) out += ' (none)';
+      entries.forEach(function (r) {
+        out += '\n  ' + (r.responseStatus || 0) + ' ' + Math.round(r.duration) + 'ms ' + r.name;
+      });
+    } catch (e) { out += ' (perf api unavailable)'; }
+    return out;
+  }
   function showBootError(title, detail) {
     try {
       var d = document.createElement('pre');
-      d.style.cssText = 'white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.5;padding:20px;margin:0;background:#171816;color:#ff6b6b;font-family:monospace';
-      d.textContent = title + '\n\n' + detail + '\n\nAndroid/WebView: ' + navigator.userAgent;
+      d.id = 'bootdiag';
+      d.style.cssText = 'white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.5;padding:20px;margin:0;background:#171816;color:#ff6b6b;font-family:monospace';
+      d.textContent = title + '\n\n' + detail + '\n\n' + reportResources() +
+        '\n\nBundle test fetch: ' + fetchReport +
+        '\nPage URL: ' + location.href +
+        '\nServiceWorker API: ' + ('serviceWorker' in navigator ? 'available' : 'not available') +
+        '\n\nAndroid/WebView: ' + navigator.userAgent;
       document.body.appendChild(d);
+      diagEl = d;
     } catch (e) {}
   }
   window.addEventListener('error', function (e) {
-    showBootError('FORM failed to start: ' + (e.message || 'JavaScript error'),
+    showBootError('FORM failed to start: ' + (e.message || 'JavaScript/resource error'),
       (e.filename || 'unknown file') + ':' + (e.lineno || '?'));
   });
   window.addEventListener('unhandledrejection', function (e) {
     showBootError('FORM failed to start: unhandled promise rejection', String(e.reason && e.reason.message || e.reason || 'unknown'));
   });
+  function probeBundle() {
+    try {
+      fetch(BUNDLE, { cache: 'no-store' }).then(function (res) {
+        return res.text().then(function (t) {
+          fetchReport = res.status + ' ' + (res.headers.get('content-type') || 'no-type') + ' ' + t.length + ' bytes';
+          if (diagEl) diagEl.textContent += '\nBundle test fetch: ' + fetchReport;
+        });
+      }).catch(function (err) {
+        fetchReport = 'FETCH FAILED: ' + err;
+        if (diagEl) diagEl.textContent += '\nBundle test fetch: ' + fetchReport;
+      });
+    } catch (e) { fetchReport = 'fetch() unavailable: ' + e; }
+  }
   setTimeout(function () {
     var root = document.getElementById('root');
     if (root && root.children.length > 0) return; // app booted fine
-    var detail = 'React did not mount within 7 seconds.';
+    probeBundle();
+    // Self-rescue: load the bundle as a classic (non-module) script — a
+    // different engine path that can bypass module/SW-specific failures.
     try {
-      var failed = performance.getEntriesByType('resource')
-        .filter(function (r) { return r.responseStatus >= 400; })
-        .map(function (r) { return r.responseStatus + ' ' + r.name; });
-      if (failed.length) detail += '\nFailed resources:\n' + failed.join('\n');
+      var s = document.createElement('script');
+      s.src = BUNDLE;
+      s.async = false;
+      document.head.appendChild(s);
     } catch (e) {}
-    showBootError('FORM failed to start', detail);
-  }, 7000);
+    setTimeout(function () {
+      var r2 = document.getElementById('root');
+      if (r2 && r2.children.length > 0) {
+        var n = document.createElement('pre');
+        n.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#171816;color:#d8ff3e;font-size:11px;padding:8px;font-family:monospace;z-index:99999';
+        n.textContent = 'Recovery: app loaded via classic-script fallback.';
+        document.body.appendChild(n);
+        return;
+      }
+      showBootError('FORM failed to start — React did not mount (even via fallback script load)',
+        'The app bundle may be blocked. Details below.');
+    }, 5000);
+  }, 4000);
 })();
 </script>
 </head>
