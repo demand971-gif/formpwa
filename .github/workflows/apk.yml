@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v3
@@ -34,23 +34,15 @@ jobs:
       - name: Sync web assets to Android
         run: npx cap sync
 
-      - name: Build Android APK
-        # The following step requires an Android SDK to be available.
-        # If you have a self‑hosted runner with the SDK installed, or you
-        # use a remote build service, uncomment and adjust the command.
-        # Otherwise you can run `./gradlew assembleDebug` on a local machine
-        # or on a runner that has the Android NDK/SDK.
-        # See: https://github.com/maxbyte96/capacitor-android-action
-        # run: |
-        #   export ANDROID_HOME="$HOME/android-sdk"
-        #   export PATH="$ANDROID_HOME/platform-tools:$PATH"
-        #   npx cap build android --release
-        # For a debug APK you can use:
-        #   npx cap build android
+      - name: Build Android APK (debug)
+        # This step assumes the self‑hosted runner has the Android SDK/NDK
+        # installed and ANDROID_HOME is set in the environment.
+        # It runs the Capacitor build which invokes gradle (assembleDebug).
+        run: npx cap build android
 
-      - name: Upload APK as artifact (if built)
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: gymapp-apk
-          path: android/app/build/outputs/apk/**
+          name: gymapp-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
