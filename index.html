@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <meta name="theme-color" content="#171816" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,11 +50,95 @@
 @keyframes pulsebar{0%,100%{box-shadow:0 12px 40px #0005}50%{box-shadow:0 12px 40px rgba(216,255,62,.25)}}
 .workoutbar.show{animation:slideUp .35s ease,pulsebar 2.4s ease infinite}
 @keyframes slideUp{from{transform:translate(-50%,18px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
-@media(max-width:900px){.nav{display:none}.session-row{grid-template-columns:1fr}.dashboard{grid-template-columns:1fr}.body-panel{min-height:auto}.figure-wrap{height:340px}.body-svg{height:320px}.cards{grid-template-columns:repeat(2,1fr)}.routines{grid-template-columns:1fr 1fr}.routine:first-child{grid-column:1/-1}.hero-bottom{align-items:flex-start}.streak{display:none}}
-@media(max-width:600px){.progress-grid{grid-template-columns:1fr 1fr}.install-bar{margin:0 14px 12px}.topbar{height:62px;padding:0 20px}.profile span{display:none}.hero{padding:34px 20px 18px}h1{font-size:56px}.hero-copy{font-size:14px}.dashboard{padding:10px 14px 30px}.body-panel{padding:19px}.today-card{padding:22px;min-height:260px}.today-card h2{font-size:36px;margin-top:50px}.start-btn{left:22px;right:auto}.library{padding:18px}.library-top{align-items:flex-start}.search{width:44px;padding:10px}.search input{display:none}.cards{grid-template-columns:1fr 1fr}.exercise{min-height:155px;padding:13px}.exercise-icon{height:52px;width:52px;margin-bottom:15px}.section{padding:40px 18px}.section-head{align-items:center}.routines{grid-template-columns:1fr}.routine:first-child{grid-column:auto}.routine{min-height:230px}.footer{padding:25px 20px 95px;display:block;line-height:1.8}.mobile-nav{display:flex;position:fixed;z-index:60;bottom:0;left:0;right:0;height:68px;background:var(--paper);border-top:1px solid var(--line);justify-content:space-around;align-items:center}.mobile-nav button{border:0;background:transparent;font-size:19px;color:#777}.mobile-nav button:first-child{color:var(--ink)}.workoutbar{bottom:78px}.runner-move{grid-template-columns:92px 1fr 28px;gap:10px}.runner-gif{width:92px;height:125px}.runner-cues{font-size:10px}.runner-copy strong{font-size:14px}.preview-strip{grid-template-columns:repeat(2,1fr)}.preview-item img{height:110px}}
+/* ===== Phone-fit lockdown: no horizontal scroll, content sticks to the screen ===== */
+html{-webkit-text-size-adjust:100%}
+html,body{overflow-x:hidden}
+body{max-width:100vw}
+img,video,svg{max-width:100%}
+.dashboard>*,.content-panel>*,.session-row>*,.cards>*,.routines>*,.studio-grid>*{min-width:0}
+.left-stopper,.right-stopper{position:fixed;top:0;bottom:0;width:20px;background:transparent;z-index:999;pointer-events:none}
+.left-stopper{left:0}
+.right-stopper{right:0}
+@media(max-width:340px){.left-stopper,.right-stopper{width:10px}}
+@media(max-width:900px){.nav{display:none}.session-row{grid-template-columns:1fr}.dashboard{grid-template-columns:1fr;gap:14px}.content-panel{gap:14px}.body-panel{min-height:auto}.figure-wrap{height:300px}.body-svg{height:280px}.cards{grid-template-columns:repeat(2,1fr)}.routines{grid-template-columns:1fr 1fr}.routine:first-child{grid-column:1/-1}.hero-bottom{align-items:flex-start}.streak{display:none}.studio-grid{grid-template-columns:1fr}.net-banner{top:62px}}
+@media(max-width:600px){
+.progress-grid{grid-template-columns:1fr 1fr}
+.install-bar{margin:0 22px 12px}
+.topbar{height:62px;padding:0 22px;gap:10px}
+.brand{font-size:20px;gap:7px}
+.brand-mark{width:25px;height:25px;font-size:12px}
+.profile{gap:8px}
+.profile span{display:none}
+.hero{padding:26px 22px 14px}
+h1{font-size:clamp(34px,10vw,50px);margin:14px 0 18px}
+.hero-copy{font-size:14px;max-width:none}
+.dashboard{padding:8px 22px 22px}
+.body-panel{padding:16px}
+.panel-head{flex-wrap:wrap;gap:8px}
+.session-row{gap:12px}
+.today-card,.cardio-card{min-height:175px;padding:20px 20px 64px}
+.today-card:after{width:210px;height:210px;border-width:42px;right:-80px;top:-70px}
+.today-card:before{width:100px;height:100px;right:70px;bottom:-60px}
+.today-card h2{font-size:26px;letter-spacing:-1.5px;margin:16px 0 10px;max-width:220px}
+.cardio-card:after{width:150px;height:150px;border-width:30px;right:-60px;top:-50px}
+.cardio-card h2{font-size:22px;letter-spacing:-1px;margin:16px 0 10px;max-width:200px}
+.start-btn{height:44px;padding:0 18px;font-size:11px;right:16px;bottom:16px}
+.meta{gap:12px;font-size:11px}
+.library{padding:16px}
+.library-top{flex-direction:column;align-items:stretch;gap:10px}
+.library h2{font-size:21px}
+.search{width:auto;flex:1;min-width:140px;padding:10px 14px}
+.search input{display:block}
+.cards{grid-template-columns:1fr 1fr;gap:10px}
+.exercise{min-height:140px;padding:12px}
+.exercise-icon{height:44px;width:44px;font-size:22px;margin-bottom:12px}
+.exercise h3{font-size:13px;margin:0 22px 4px 0}
+.section{padding:30px 22px}
+.section h2{font-size:clamp(26px,7.5vw,34px);letter-spacing:-2px}
+.routines{grid-template-columns:1fr;gap:12px}
+.routine:first-child{grid-column:auto}
+.routine{min-height:0;padding:18px}
+.routine h3{font-size:24px}
+.routine p{max-width:none;font-size:11.5px}
+.studio-card{padding:16px}
+.modal{padding:0;align-items:flex-end}
+.sheet{width:100%;max-width:100%;max-height:94vh;border-radius:22px 22px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h2{font-size:26px;margin:6px 0}
+.demo{height:180px;font-size:56px}
+.demo:before{width:120px;height:120px;border-width:22px}
+.runner-move{grid-template-columns:84px 1fr 28px;gap:10px}
+.runner-gif{width:84px;height:104px}
+.runner-cues{font-size:10px}
+.runner-copy strong{font-size:14px}
+.clock-main{font-size:50px}
+.clock-panel{padding:14px 12px 12px}
+.preview-strip{grid-template-columns:repeat(2,1fr)}
+.preview-item img{height:96px}
+.program-day{grid-template-columns:44px 1fr auto;padding:10px}
+.day-num{width:38px;height:38px}
+.program-start{height:46px;font-size:12px}
+.footer{padding:22px 22px calc(96px + env(safe-area-inset-bottom));display:block;line-height:1.7}
+.mobile-nav{display:flex;position:fixed;z-index:60;bottom:0;left:0;right:0;height:64px;background:var(--paper);border-top:1px solid var(--line);justify-content:space-around;align-items:center;padding-bottom:env(safe-area-inset-bottom)}
+.mobile-nav button{border:0;background:transparent;font-size:19px;color:#777;padding:4px 12px}
+.mobile-nav button:first-child{color:var(--ink)}
+.workoutbar{left:22px;right:22px;transform:none;bottom:calc(74px + env(safe-area-inset-bottom));padding:10px 14px;gap:10px;max-width:none}
+.workoutbar .phase{font-size:10px}
+#activeName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.toast{top:70px;width:max-content;max-width:calc(100vw - 44px)}
+}
+@media(max-width:360px){
+.left-stopper,.right-stopper{width:10px}
+.topbar{padding:0 16px;height:58px}
+.hero,.dashboard,.section,.footer{padding-left:16px;padding-right:16px}
+.install-bar{margin:0 16px 12px}
+.install-chip{padding:0 8px;font-size:10px}
+.theme-btn,.install-chip{height:32px}
+.workoutbar{left:16px;right:16px}
+}
 </style>
 </head>
 <body>
+<div class="left-stopper" aria-hidden="true"></div><div class="right-stopper" aria-hidden="true"></div>
 <div class="app">
 <header class="topbar"><div class="brand"><span class="brand-mark">F</span> FORM</div><nav class="nav"><a class="active" href="#train">Train</a><a href="#library">Exercises</a><a href="#plans">Programs</a><a href="#studio">Tools</a><a href="#progress">Progress</a></nav><div class="profile"><button class="theme-btn" id="themeToggle" type="button">DARK</button><button class="install-chip" id="openInstall" type="button">INSTALL APP</button><span>Hey, Athlete</span><div class="avatar">A</div></div></header>
 <div class="install-bar show" id="installBar"><div><b>Use FORM as an app</b><div class="micro" style="color:#bbb">Install the PWA — home screen icon, full screen, works offline.</div></div><div style="display:flex;gap:8px"><button type="button" id="installApp">INSTALL</button><button type="button" id="installHow" class="ghost-install">HOW</button></div></div>
