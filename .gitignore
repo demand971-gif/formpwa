@@ -6,10 +6,9 @@ Thumbs.db
 __pycache__/
 .venv/
 node_modules/
-dist/
 FORM-PWA.zip
-public/media/real/new-*.png
-public/media/real/set*.png
+media/real/new-*.png
+media/real/set*.png
 process_media.py
 
 # Android build outputs & local config
