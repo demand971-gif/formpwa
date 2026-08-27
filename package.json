@@ -1,21 +1,23 @@
 {
-  "name": "form-pwa",
-  "version": "1.0.0",
-  "description": "FORM — Train with intention gym training app",
+  "name": "gym-app",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "serve": "python3 -m http.server 8000",
-    "sync:assets": "./scripts/sync-assets.sh",
-    "build:apk": "./build-apk.sh debug",
-    "build:apk:release": "./build-apk.sh release"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "pwa",
-    "fitness",
-    "android",
-    "apk",
-    "webview"
-  ],
-  "author": "",
-  "license": "UNLICENSED"
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.79.0",
+    "vite": "^8.2.2"
+  }
 }

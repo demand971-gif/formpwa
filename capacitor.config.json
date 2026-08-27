@@ -1,9 +1,0 @@
-{
-  "appId": "com.formgym.form",
-  "appName": "FORM",
-  "webDir": "android/app/src/main/assets",
-  "backgroundColor": "#171816",
-  "android": {
-    "allowMixedContent": true
-  }
-}
