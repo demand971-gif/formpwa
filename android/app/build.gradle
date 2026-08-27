@@ -1,0 +1,78 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.formgym.form'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.formgym.form"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        debug {
+            // Default debug keystore
+        }
+        release {
+            def keystoreFile = System.getenv("KEYSTORE_FILE") ? file(System.getenv("KEYSTORE_FILE")) : null
+            if (keystoreFile != null && keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword System.getenv("KEYSTORE_PASSWORD") ?: "android"
+                keyAlias System.getenv("KEY_ALIAS") ?: "androiddebugkey"
+                keyPassword System.getenv("KEY_PASSWORD") ?: "android"
+            } else {
+                initWith(signingConfigs.debug)
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+            minifyEnabled false
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    // Auto-sync web assets from project root prior to building APK
+    tasks.register('syncWebAssets', Copy) {
+        def rootDir = project.rootDir.parentFile
+        from(rootDir) {
+            include 'index.html'
+            include 'offline.html'
+            include 'manifest.json'
+            include 'manifest.webmanifest'
+            include 'sw.js'
+            include 'icons/**'
+            include 'media/**'
+        }
+        into layout.projectDirectory.dir('src/main/assets')
+    }
+
+    tasks.named('preBuild') {
+        dependsOn 'syncWebAssets'
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.webkit:webkit:1.10.0'
+}
