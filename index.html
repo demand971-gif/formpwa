@@ -12,6 +12,39 @@
 <link rel="icon" href="icons/icon-192.png" />
 <link rel="apple-touch-icon" href="icons/icon-180.png" />
 <title>FORM — Train with intention</title>
+<style>html,body{background:#f5f1e8;margin:0}</style>
+<script>
+// Boot watchdog: if the app fails to start, show WHY on screen instead of a blank page.
+(function () {
+  function showBootError(title, detail) {
+    try {
+      var d = document.createElement('pre');
+      d.style.cssText = 'white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.5;padding:20px;margin:0;background:#171816;color:#ff6b6b;font-family:monospace';
+      d.textContent = title + '\n\n' + detail + '\n\nAndroid/WebView: ' + navigator.userAgent;
+      document.body.appendChild(d);
+    } catch (e) {}
+  }
+  window.addEventListener('error', function (e) {
+    showBootError('FORM failed to start: ' + (e.message || 'JavaScript error'),
+      (e.filename || 'unknown file') + ':' + (e.lineno || '?'));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    showBootError('FORM failed to start: unhandled promise rejection', String(e.reason && e.reason.message || e.reason || 'unknown'));
+  });
+  setTimeout(function () {
+    var root = document.getElementById('root');
+    if (root && root.children.length > 0) return; // app booted fine
+    var detail = 'React did not mount within 7 seconds.';
+    try {
+      var failed = performance.getEntriesByType('resource')
+        .filter(function (r) { return r.responseStatus >= 400; })
+        .map(function (r) { return r.responseStatus + ' ' + r.name; });
+      if (failed.length) detail += '\nFailed resources:\n' + failed.join('\n');
+    } catch (e) {}
+    showBootError('FORM failed to start', detail);
+  }, 7000);
+})();
+</script>
 </head>
 <body>
 <div class="left-stopper" aria-hidden="true"></div><div class="right-stopper" aria-hidden="true"></div>

@@ -546,7 +546,7 @@ export default function App() {
       />
 
       <footer className="footer">
-        <div>FORM © 2026 · TRAIN WITH INTENTION</div>
+        <div>FORM v2.1 © 2026 · TRAIN WITH INTENTION</div>
         <div>Exercise guidance is educational. Stop if you feel pain and consult a qualified professional when needed.</div>
       </footer>
 
