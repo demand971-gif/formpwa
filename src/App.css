@@ -19,5 +19,16 @@
   margin-right: 22px;
 }
 
+/* Reduce stopper width and content inset on very small phones */
+@media (max-width: 340px) {
+  .left-stopper, .right-stopper { width: 10px; }
+  .content { margin-left: 12px; margin-right: 12px; }
+}
+
+/* On bigger screens, center the content with a max width */
+@media (min-width: 341px) {
+  .content { max-width: 400px; margin: 0 auto; }
+}
+
 /* Make sure inner components fill the available width */
 .gym-name-form, .exercise-library { width: 100%; }
