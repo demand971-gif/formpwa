@@ -135,12 +135,41 @@ h1{font-size:clamp(34px,10vw,50px);margin:14px 0 18px}
 .theme-btn,.install-chip{height:32px}
 .workoutbar{left:16px;right:16px}
 }
+
+/* Hamburger menu (mobile) */
+.menu-btn{display:none}
+.menu-scrim{position:fixed;left:0;right:0;top:62px;bottom:0;background:rgba(23,24,22,.45);opacity:0;pointer-events:none;transition:opacity .3s;z-index:90}
+.menu-scrim.open{opacity:1;pointer-events:auto}
+.menu-panel{position:fixed;left:0;right:0;top:62px;z-index:95;background:var(--paper);border-bottom:1px solid var(--line);box-shadow:0 18px 50px rgba(31,35,22,.22);padding:14px 22px 22px;transform:translateY(-110%);transition:transform .3s ease;display:none}
+.menu-panel.open{transform:translateY(0)}
+.menu-panel a{display:block;text-decoration:none;color:var(--ink);font-size:22px;font-weight:900;letter-spacing:-.5px;padding:14px 2px;border-bottom:1px solid var(--line)}
+.menu-row{display:flex;gap:10px;margin-top:14px}
+.menu-action{flex:1;border:1px solid var(--line);background:transparent;border-radius:99px;padding:10px 8px;font-size:12px;font-weight:900;cursor:pointer;color:var(--ink)}
+@media(max-width:900px){
+.menu-btn{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--paper);cursor:pointer;flex:none}
+.menu-btn span{display:block;width:18px;height:2px;background:var(--ink);border-radius:2px;transition:.25s}
+.menu-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.menu-panel{display:block}
+}
+@media(max-width:600px){.install-chip{display:none}}
+@media(max-width:360px){.menu-scrim{top:58px}.menu-panel{top:58px;padding:12px 16px 18px}}
 </style>
 </head>
 <body>
 <div class="left-stopper" aria-hidden="true"></div><div class="right-stopper" aria-hidden="true"></div>
 <div class="app">
-<header class="topbar"><div class="brand"><span class="brand-mark">F</span> FORM</div><nav class="nav"><a class="active" href="#train">Train</a><a href="#library">Exercises</a><a href="#plans">Programs</a><a href="#studio">Tools</a><a href="#progress">Progress</a></nav><div class="profile"><button class="theme-btn" id="themeToggle" type="button">DARK</button><button class="install-chip" id="openInstall" type="button">INSTALL APP</button><span>Hey, Athlete</span><div class="avatar">A</div></div></header>
+<header class="topbar"><div class="brand"><span class="brand-mark">F</span> FORM</div><button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button><nav class="nav"><a class="active" href="#train">Train</a><a href="#library">Exercises</a><a href="#plans">Programs</a><a href="#studio">Tools</a><a href="#progress">Progress</a></nav><div class="profile"><button class="theme-btn" id="themeToggle" type="button">DARK</button><button class="install-chip" id="openInstall" type="button">INSTALL APP</button><span>Hey, Athlete</span><div class="avatar">A</div></div></header>
+<div class="menu-scrim" id="menuScrim"></div>
+<nav class="menu-panel" id="menuPanel" aria-label="Sections">
+  <a href="#train">⌂ &nbsp;Train</a>
+  <a href="#library">◫ &nbsp;Exercises</a>
+  <a href="#plans">◎ &nbsp;Programs</a>
+  <a href="#studio">⚙ &nbsp;Tools</a>
+  <a href="#progress">◉ &nbsp;Progress</a>
+  <div class="menu-row"><button type="button" id="menuInstall" class="menu-action">↓ &nbsp;Install app</button><button type="button" id="menuTheme" class="menu-action">◐ &nbsp;Dark / light</button></div>
+</nav>
 <div class="install-bar show" id="installBar"><div><b>Use FORM as an app</b><div class="micro" style="color:#bbb">Install the PWA — home screen icon, full screen, works offline.</div></div><div style="display:flex;gap:8px"><button type="button" id="installApp">INSTALL</button><button type="button" id="installHow" class="ghost-install">HOW</button></div></div>
 <div class="net-banner offline" id="offlineBanner">You're offline — FORM is using the service worker cache.</div>
 <div class="net-banner update" id="updateBanner">A new version of FORM is ready. Tap to update.</div>
@@ -362,7 +391,7 @@ h1{font-size:clamp(34px,10vw,50px);margin:14px 0 18px}
 <div class="micro" style="margin:22px 0 10px">Personal records (1RM Best)</div>
 <div class="session-log" id="prLog"><div class="empty">Log sets with weights and reps to see your 1RM PRs.</div></div>
 </section>
-<footer class="footer"><div>FORM v3.0 © 2026 · TRAIN WITH INTENTION</div><div>Exercise guidance is educational. Stop if you feel pain and consult a qualified professional when needed.</div></footer>
+<footer class="footer"><div>FORM v3.1 © 2026 · TRAIN WITH INTENTION</div><div>Exercise guidance is educational. Stop if you feel pain and consult a qualified professional when needed.</div></footer>
 <nav class="mobile-nav"><button onclick="location.hash='train'">⌂</button><button onclick="location.hash='library'">◫</button><button onclick="location.hash='plans'">◎</button><button onclick="location.hash='progress'">◉</button></nav>
 </div>
 <div class="modal" id="modal"><div class="sheet"><button class="close" id="closeModal">×</button><div class="micro">Exercise guide</div><h2 id="modalTitle">Goblet squat</h2><div class="detail-meta" id="modalMeta"></div><div class="media-tabs" id="mediaTabs" style="display:none"><button class="media-tab on" data-media="picture">PICTURE</button><button class="media-tab" data-media="gif">GIF</button><button class="media-tab" data-media="video">VIDEO</button></div><div class="demo" id="modalIcon">🏋️</div><div class="cues"><div class="micro">Coach cues</div><ul id="modalCues"></ul><a class="youtube-link" id="modalYoutube" href="#" target="_blank" rel="noopener noreferrer"><span class="youtube-icon">▶</span>WATCH FORM VIDEOS ON YOUTUBE ↗</a>
@@ -2288,6 +2317,26 @@ document.addEventListener('click',()=>{if(soundOn)ensureAudio()},{once:true});
       renderExtendedResults();
     };
   }
+})();
+
+/* Hamburger menu — quick-jump to any section instead of scrolling the long page */
+(function(){
+  var btn=document.getElementById('menuBtn'),panel=document.getElementById('menuPanel'),scrim=document.getElementById('menuScrim');
+  if(!btn||!panel)return;
+  function setMenu(open){
+    btn.classList.toggle('open',open);
+    panel.classList.toggle('open',open);
+    if(scrim)scrim.classList.toggle('open',open);
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  }
+  btn.onclick=function(e){e.stopPropagation();setMenu(!panel.classList.contains('open'))};
+  if(scrim)scrim.onclick=function(){setMenu(false)};
+  panel.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){setMenu(false)})});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setMenu(false)});
+  var mi=document.getElementById('menuInstall');
+  if(mi)mi.onclick=function(){setMenu(false);if(typeof promptInstall==='function')promptInstall()};
+  var mt=document.getElementById('menuTheme');
+  if(mt)mt.onclick=function(){var t=document.getElementById('themeToggle');if(t)t.click()};
 })();
 </script>
 </body></html>
